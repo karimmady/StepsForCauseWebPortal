@@ -1,0 +1,20 @@
+<div *ngIf="!loading">
+  <form nz-form [formGroup]="signupForm">
+    <nz-form-item>
+      <nz-form-label [nzSm]="4" [nzXs]="24" nzFor="nickname" nzRequired>Company</nz-form-label>
+      <nz-form-control [nzSm]="16" [nzXs]="24">
+        <input nz-input id="companyName" formControlName="companyName" style="width: 200px;"
+          (change)="checkFormsValidity();">
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSm]="4" [nzXs]="24" nzFor="nickname" nzRequired>Total Steps</nz-form-label>
+      <nz-form-control [nzSm]="16" [nzXs]="24">
+        <input nz-input id="totalSteps" formControlName="totalSteps" style="width: 200px;"
+          (change)="checkFormsValidity();">
+      </nz-form-control>
+    </nz-form-item>
+    <button nz-button nzType="primary" style="margin-top: 5px" (click)="checkFormsValidity(); submitClicked();"
+    [disabled]='!validCompanyInfo'>Submit</button>
+  </form>
+</div>

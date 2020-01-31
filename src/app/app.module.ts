@@ -1,18 +1,41 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
+import { HeaderComponent } from './header/header.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { NgZorroAntdModule, NZ_I18N, en_US, zh_CN} from 'ng-zorro-antd';
+import { registerLocaleData } from '@angular/common';
+import { FooterComponent } from './footer/footer.component';
+import { CommonModule } from '@angular/common';
+import en from '@angular/common/locales/en';
+import { HttpModule } from '@angular/http';
+import { SignupFormComponent } from './signup-form/signup-form.component';
+
+registerLocaleData(en);
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HeaderComponent,
+    FooterComponent,
+    SignupFormComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    FormsModule,
+    HttpClientModule,
+    NgZorroAntdModule,
+    ReactiveFormsModule,
+    CommonModule,
+    HttpModule,
   ],
-  providers: [],
+  providers: [{ provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
