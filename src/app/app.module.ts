@@ -14,6 +14,10 @@ import { CommonModule } from '@angular/common';
 import en from '@angular/common/locales/en';
 import { HttpModule } from '@angular/http';
 import { SignupFormComponent } from './signup-form/signup-form.component';
+import { LandingPageComponent } from './landing-page/landing-page.component';
+import { AngularFireModule } from 'angularfire2';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { environment } from '../environments/environment';
 
 registerLocaleData(en);
 
@@ -22,7 +26,8 @@ registerLocaleData(en);
     AppComponent,
     HeaderComponent,
     FooterComponent,
-    SignupFormComponent
+    SignupFormComponent,
+    LandingPageComponent
   ],
   imports: [
     BrowserModule,
@@ -34,6 +39,8 @@ registerLocaleData(en);
     ReactiveFormsModule,
     CommonModule,
     HttpModule,
+    AngularFireModule.initializeApp(environment.firebase, 'steps-for-cause'),
+    AngularFireDatabaseModule
   ],
   providers: [{ provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent]
