@@ -1,1 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+.ant-layout-header {
+    padding: 0;
+    background: #0076CE;
+}
+
+.ant-card-meta-title {
+    font-size: 24px;
+}
+
+.ant-card {
+    font-size: 20px;
+}

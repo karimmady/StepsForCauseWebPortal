@@ -1,0 +1,11 @@
+:host {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+}
+
+.header__logo {
+    padding: 0;
+    margin-left: 1%;
+}

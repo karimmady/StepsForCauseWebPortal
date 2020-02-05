@@ -1,0 +1,8 @@
+<nz-card nzHoverable style="width:500px; display: flex; flex: 1; flex-direction: column; align-self: center; margin-top: 60px;" [nzCover]="coverTemplate">
+  <nz-card-meta nzTitle="Name" nzDescription="{{user.name}}" style="margin-bottom: 10px;"></nz-card-meta>
+  <nz-card-meta nzTitle="Email" nzDescription="{{user.email}}" style="margin-bottom: 10px;"></nz-card-meta>
+  <nz-card-meta nzTitle="Step Count" nzDescription="{{user.stepCount}}" style="margin-bottom: 10px;"></nz-card-meta>
+</nz-card>
+<ng-template #coverTemplate>
+  <img alt="example" src="../../assets/yasser.jpg" />
+</ng-template>

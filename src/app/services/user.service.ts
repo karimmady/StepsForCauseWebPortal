@@ -8,7 +8,6 @@ import * as mime from 'mime-types'
   providedIn: 'root'
 })
 export class UserService {
-
   constructor(private http: HttpClient) {
    }
 

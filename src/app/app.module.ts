@@ -18,6 +18,11 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { environment } from '../environments/environment';
+import { AdminLoginComponent } from './admin-login/admin-login.component';
+import { LoginComponent } from './login/login.component';
+import { AngularFireAuth } from '@angular/fire/auth';
+import * as firebase from 'firebase/app';
+import { UserComponent } from './user/user.component';
 
 registerLocaleData(en);
 
@@ -27,7 +32,10 @@ registerLocaleData(en);
     HeaderComponent,
     FooterComponent,
     SignupFormComponent,
-    LandingPageComponent
+    LandingPageComponent,
+    AdminLoginComponent,
+    LoginComponent,
+    UserComponent
   ],
   imports: [
     BrowserModule,
@@ -40,9 +48,10 @@ registerLocaleData(en);
     CommonModule,
     HttpModule,
     AngularFireModule.initializeApp(environment.firebase, 'steps-for-cause'),
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+    // AngularFireAuth
   ],
-  providers: [{ provide: NZ_I18N, useValue: en_US }],
+  providers: [AngularFireAuth, , AngularFireDatabaseModule, AngularFireModule,{ provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
