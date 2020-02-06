@@ -23,6 +23,7 @@ import { LoginComponent } from './login/login.component';
 import { AngularFireAuth } from '@angular/fire/auth';
 import * as firebase from 'firebase/app';
 import { UserComponent } from './user/user.component';
+import { TestComponent } from './test/test.component';
 
 registerLocaleData(en);
 
@@ -35,7 +36,8 @@ registerLocaleData(en);
     LandingPageComponent,
     AdminLoginComponent,
     LoginComponent,
-    UserComponent
+    UserComponent,
+    TestComponent
   ],
   imports: [
     BrowserModule,

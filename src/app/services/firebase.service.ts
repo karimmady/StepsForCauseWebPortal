@@ -50,6 +50,10 @@ export class FirebaseService {
       .signOut();
   }
 
+  updateStepCount(user: firebase.User, currentStepCount, addedStepCount) {
+    return this.dbref.child(user.uid).update({'stepCount': +currentStepCount + +addedStepCount});
+  }
+
   changeSignUpStatus(flag: boolean) {
     console.log("Changing status", flag)
     this.signUp.next(flag)
