@@ -7,5 +7,40 @@
 
 .header__logo {
     padding: 0;
-    margin-left: 1%;
+    width: 100%;
+    height: 64px;
+    text-align: center;
+}
+
+.dell-content {
+    align-items: center;
+    display: flex;
+    margin-right: 2%;
+    float: right;
+}
+
+.dell-title {
+    font-size: 15px;
+    color: white;
+    margin: 0px 12px 0px 0px;
+}
+
+.zayed-wrapper {
+    align-content: center;
+    justify-content: center;
+    width: 22%;
+    text-align: center;
+    display: inline-block;
+    margin-top: 1%;
+}
+
+.zayed-title {
+    margin: 0 auto;
+    font-size: 15px;
+    color: white;
+    line-height: 1;
+}
+
+.islamic-affairs-wrapper {
+    float: left;
 }

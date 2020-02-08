@@ -11,3 +11,7 @@
 .ant-card {
     font-size: 20px;
 }
+
+.ant-layout-header {
+    padding: 0px !important;
+}

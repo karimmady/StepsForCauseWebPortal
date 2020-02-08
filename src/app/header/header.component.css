@@ -6,5 +6,11 @@
     float: left;
   }
   .header__logo {
-    float: left;
+    width: 14%;
+    float: right;
+    height: 64px;
+    justify-content: center;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
   }
