@@ -21,7 +21,6 @@ import { AdminLoginComponent } from './admin-login/admin-login.component';
 import { LoginComponent } from './login/login.component';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { UserComponent } from './user/user.component';
-import { TestComponent } from './test/test.component';
 
 registerLocaleData(en);
 
@@ -34,7 +33,6 @@ registerLocaleData(en);
     AdminLoginComponent,
     LoginComponent,
     UserComponent,
-    TestComponent
   ],
   imports: [
     BrowserModule,

@@ -5,11 +5,10 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
 import { AdminLoginComponent } from './admin-login/admin-login.component';
 import { LoginComponent } from './login/login.component';
 import { UserComponent } from './user/user.component';
-import { TestComponent } from './test/test.component';
-const routes: Routes = [ 
+const routes: Routes = [
   {
     path: '',
-    component:LandingPageComponent
+    component: LandingPageComponent
   },
   {
     path: 'signup',
@@ -27,10 +26,6 @@ const routes: Routes = [
     path: 'user',
     component: UserComponent
   },
-  {
-    path: 'test',
-    component: TestComponent
-  }
 ];
 
 @NgModule({
