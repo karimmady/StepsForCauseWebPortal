@@ -2,20 +2,25 @@
   <div class="bb">
     <div class="center-page-wrapper">
       <div class="center-page">
-        <h1 style="text-align: center; color: #0076CE; z-index: 1; font-size: 70px; font-weight: bold;">Walking for Good Cause
-        </h1>
+        <h1 class="title">Walking for Good Cause</h1>
       </div>
       <div class="center-page">
-        <button nz-button nzType="primary" style="width: 250px; font-size: 30px; height: 50px;" (click)="loginPage();">Login</button>
+        <button class="login-btn" nz-button nzType="primary" (click)="loginPage();">Login</button>
       </div>
       <div class="center-page">
-        <button nz-button nzType="primary" style="top: 25%;width: 250px; font-size: 20px; height: 50px;" (click)="signUpPage();">Sign up with Email</button>
+        <button class="signup-btn" nz-button nzType="primary" (click)="signUpPage();">Sign up with Email</button>
       </div>
       <div class="center-page">
-        <button nz-button nzType="primary" style="top: 50%;width: 250px; font-size: 20px; height: 50px; background-color: #ffffff; color: #0F9D58" (click)="googleSignIn();"><img src = "../assets/google_logo.png" style = "width: 25px; margin-right: 10px;">Login with Google</button>
+        <button class="google-signup-btn" nz-button nzType="primary" (click)="googleSignIn();">
+          <img class="social-media-logo" src="../assets/google_logo.png">
+          Login with Google
+        </button>
       </div>
       <div class="center-page">
-        <button nz-button nzType="primary" style="top: 75%;width: 250px; font-size: 20px; height: 50px; background-color: #ffffff; color: #6d84b4; padding : 0px 8px !important" (click)="facebookSignIn();"><img src = "../assets/Facebook_Logo.png" style = "width: 25px; margin-right: 10px;">Login with Facebook</button>
+        <button class="facebook-signup-btn" nz-button nzType="primary" (click)="facebookSignIn();">
+          <img class="social-media-logo" src="../assets/Facebook_Logo.png">
+          Login with Facebook
+        </button>
       </div>
     </div>
   </div>

@@ -1,33 +1,28 @@
-/* :host {
-    position: fixed;
-    width: 100%;
-    z-index: 3;
-} */
-
 .dubai-gov-logo {
-    width: 22%;
-    margin-bottom: 0%;
-    justify-self: left;
+  width: 22%;
+  margin-bottom: 0%;
+  justify-self: left;
 }
 
 .footer-text {
-    text-align: center;
-    width: fit-content;
-    justify-self: center;
-    flex: 1;
-    flex-direction: column;
-    margin-top: 40px;
+  text-align: center;
+  width: fit-content;
+  justify-self: center;
+  flex: 1;
+  flex-direction: column;
+  margin-top: 40px;
 }
 
 .footer {
-    display: flex;
-    flex: 1;
-    flex-direction: row;
-    height: 69px;
-    align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  height: 69px;
+  align-items: center;
+  padding-left: 0px !important;
 }
 
 .footer-text-content {
-    text-align: right;
-    font-size: 12px;
+  text-align: right;
+  font-size: 12px;
 }

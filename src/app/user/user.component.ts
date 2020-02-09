@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { UserService } from '../services/user.service';
 import { FirebaseService } from '../services/firebase.service';
 import { AngularFireDatabase } from 'angularfire2/database';
 

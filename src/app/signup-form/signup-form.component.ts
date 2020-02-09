@@ -1,17 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import {
-  FormBuilder,
   FormGroup,
   FormControl,
   Validators,
-  ReactiveFormsModule
 } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd';
-import { UserService } from '../services/user.service';
 import { Router } from "@angular/router";
 import { FirebaseService } from '../services/firebase.service';
-import { error } from 'protractor';
 class User {
   constructor(public firstName, public lastName, public email, public password) { }
 }
@@ -21,8 +17,6 @@ class User {
   templateUrl: './signup-form.component.html',
   styleUrls: ['./signup-form.component.css']
 })
-
-
 
 export class SignupFormComponent implements OnInit {
   loading = false;
@@ -52,7 +46,7 @@ export class SignupFormComponent implements OnInit {
     ])
   });
 
-  constructor(private firebase: FirebaseService, private modalService: NzModalService, private router: Router, db: AngularFireDatabase) {
+  constructor(private firebase: FirebaseService, db: AngularFireDatabase) {
     this.users = db.list('/users')
     this.com = this.users.valueChanges();
     this.com.subscribe(res => console.log(res))

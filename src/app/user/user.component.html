@@ -1,17 +1,16 @@
-<div style="display: flex; flex: 1; flex-direction: row; align-items: center; justify-content: center;">
-  <nz-card nzHoverable
-    style="width:266px; align-self: center; margin-top: 3px;"
-    [nzCover]="coverTemplate">
-    <nz-card-meta nzTitle="Name" nzDescription="{{user.name}}" style="margin-bottom: 10px;"></nz-card-meta>
-    <nz-card-meta nzTitle="Email" nzDescription="{{user.email}}" style="margin-bottom: 10px;"></nz-card-meta>
-    <nz-card-meta nzTitle="Step Count" nzDescription="{{user.stepCount}}" style="margin-bottom: 10px;"></nz-card-meta>
+<div class="outer-wrapper">
+  <nz-card nzHoverable class="card" [nzCover]="coverTemplate">
+    <nz-card-meta class="card-content" nzTitle="Name" nzDescription="{{user.name}}"></nz-card-meta>
+    <nz-card-meta class="card-content" nzTitle="Email" nzDescription="{{user.email}}"></nz-card-meta>
+    <nz-card-meta class="card-content" nzTitle="Step Count" nzDescription="{{user.stepCount}}"></nz-card-meta>
+    <div class="add-steps-wrapper">
+      <button class="card-content" nz-button nzType="primary" (click)="toggleAddSteps()">Add Steps</button>
+      <input class="card-content" *ngIf="addSteps" [(ngModel)]="steps" placeholder="Step count">
+      <button class="card-content" *ngIf="addSteps" nz-button nzType="primary"
+        (click)="submit(steps.value)">Submit</button>
+    </div>
   </nz-card>
   <ng-template #coverTemplate>
-    <img alt="example" src="../../assets/yasser.jpg" />
+    <img class="card-image" alt="example" src="{{user.photo}}" />
   </ng-template>
-  <div style="display: flex; flex-direction: column; margin-left: 30px;">
-    <button nz-button nzType="primary" (click)="toggleAddSteps()" style="margin-bottom: 10px;">Add Steps</button>
-    <input *ngIf="addSteps" [(ngModel)]="steps" placeholder="Step count">
-    <button *ngIf="addSteps" nz-button nzType="primary" (click)="submit(steps.value)" style="margin-top: 10px;">Submit</button>
-  </div>
 </div>

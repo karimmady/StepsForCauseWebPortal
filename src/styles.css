@@ -1,17 +1,35 @@
 /* You can add global styles to this file, and also import other style files */
 .ant-layout-header {
-    padding: 0;
-    background: #0076CE;
+  padding: 0;
+  background: #0076ce;
 }
 
 .ant-card-meta-title {
-    font-size: 24px;
+  font-size: 24px;
 }
 
 .ant-card {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 .ant-layout-header {
-    padding: 0px !important;
+  padding: 0px !important;
+}
+
+div.ant-card-cover {
+  justify-content: center;
+  display: flex;
+  width: 31%;
+}
+
+.ant-card-body {
+    width: 60%;
+}
+
+.ant-card-meta-title {
+    font-size: 22px !important;
+}
+
+.ant-card-meta-description {
+    font-size: 19px;
 }

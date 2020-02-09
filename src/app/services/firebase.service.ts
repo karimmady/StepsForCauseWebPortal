@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from "@angular/fire/auth";
 import { Observable, BehaviorSubject } from 'rxjs';
 import * as firebase from 'firebase';
-import { AngularFireDatabase } from 'angularfire2/database';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +12,6 @@ export class FirebaseService {
   user: any;
   private signUp = new BehaviorSubject(false);
   signUpStatus = this.signUp.asObservable();
-
-  
 
   constructor(private angularFireAuth: AngularFireAuth) {
     this.userData = angularFireAuth.authState;
@@ -40,7 +37,7 @@ export class FirebaseService {
   async SignIn(email: string, password: string) {
     var user = (await this.angularFireAuth.auth
       .signInWithEmailAndPassword(email, password)).user
-    
+
     return user;
   }
 
@@ -51,7 +48,7 @@ export class FirebaseService {
   }
 
   updateStepCount(user: firebase.User, currentStepCount, addedStepCount) {
-    return this.dbref.child(user.uid).update({'stepCount': +currentStepCount + +addedStepCount});
+    return this.dbref.child(user.uid).update({ 'stepCount': +currentStepCount + +addedStepCount });
   }
 
   changeSignUpStatus(flag: boolean) {
