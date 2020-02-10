@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import {
-  FormBuilder,
   FormGroup,
   FormControl,
   Validators,
-  ReactiveFormsModule
 } from '@angular/forms';
 import { NzModalService } from 'ng-zorro-antd';
-import { UserService } from '../services/user.service';
 import { Router } from "@angular/router";
+import { FirebaseService } from '../services/firebase.service';
+class User {
+  constructor(public firstName, public lastName, public email, public password) { }
+}
 
 @Component({
   selector: 'app-signup-form',
@@ -20,23 +22,34 @@ export class SignupFormComponent implements OnInit {
   loading = false;
   submittedForm = false;
   validCompanyInfo = false;
-  companyName:any;
-  totalSteps:any;
-
+  companyName: any;
+  totalSteps: any;
+  public users: AngularFireList<User>;
+  com: any;
 
   signupForm = new FormGroup({
-    companyName: new FormControl('', [
+    firstName: new FormControl('', [
       Validators.required,
       Validators.pattern('[a-zA-Z ]+')
     ]),
-    totalSteps: new FormControl('', [
+    lastName: new FormControl('', [
       Validators.required,
-      Validators.pattern(/^-?(0|[1-9]\d*)?$/)
+      Validators.pattern('[a-zA-Z ]+')
+    ]),
+    email: new FormControl('', [
+      Validators.required,
+      Validators.pattern(/^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/)
+    ]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.pattern("^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$")
     ])
   });
 
-  constructor(private userservice: UserService, private modalService: NzModalService, private router: Router) {
-
+  constructor(private firebase: FirebaseService, db: AngularFireDatabase) {
+    this.users = db.list('/users')
+    this.com = this.users.valueChanges();
+    this.com.subscribe(res => console.log(res))
   }
 
   checkFormsValidity(): void {
@@ -46,11 +59,12 @@ export class SignupFormComponent implements OnInit {
   ngOnInit() {
 
   }
-  submitClicked() {
-    this.submittedForm = true;
-    this.companyName = this.signupForm.value.companyName;
-    this.totalSteps = this.signupForm.value.totalSteps;
-    this.userservice.setCompanySteps(this.companyName,this.totalSteps)
+
+  async submitClicked() {
+    await this.firebase.SignUp(this.signupForm.value.email, this.signupForm.value.password, this.signupForm.value.firstName, this.signupForm.value.lastName, 0).catch(err => {
+      alert(err);
+    })
+    alert("Please verify your email to login")
   }
 }
 

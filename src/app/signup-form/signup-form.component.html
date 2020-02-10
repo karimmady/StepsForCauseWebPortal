@@ -1,20 +1,36 @@
-<div *ngIf="!loading">
-  <form nz-form [formGroup]="signupForm">
-    <nz-form-item>
-      <nz-form-label [nzSm]="4" [nzXs]="24" nzFor="nickname" nzRequired>Company</nz-form-label>
-      <nz-form-control [nzSm]="16" [nzXs]="24">
-        <input nz-input id="companyName" formControlName="companyName" style="width: 200px;"
-          (change)="checkFormsValidity();">
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-label [nzSm]="4" [nzXs]="24" nzFor="nickname" nzRequired>Total Steps</nz-form-label>
-      <nz-form-control [nzSm]="16" [nzXs]="24">
-        <input nz-input id="totalSteps" formControlName="totalSteps" style="width: 200px;"
-          (change)="checkFormsValidity();">
-      </nz-form-control>
-    </nz-form-item>
-    <button nz-button nzType="primary" style="margin-top: 5px" (click)="checkFormsValidity(); submitClicked();"
-    [disabled]='!validCompanyInfo'>Submit</button>
-  </form>
+<div class="bb">
+  <div class="bb-overlay">
+    <form nz-form [formGroup]="signupForm">
+      <div class="center">
+        <h1 class="signup-title">Walking for Good Cause Sign Up</h1>
+      </div>
+      <div class="center">
+        <nz-form-item>
+          <nz-form-control [nzSm]="16" [nzXs]="24">
+            <input class="input-field" nz-input id="firstName" placeholder="First Name" formControlName="firstName"
+              (change)="checkFormsValidity();">
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-control [nzSm]="16" [nzXs]="24">
+            <input class="input-field" nz-input id="lastName" placeholder="Last Name" formControlName="lastName"
+              (change)="checkFormsValidity();">
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-control [nzSm]="16" [nzXs]="24">
+            <input class="input-field" nz-input id="email" placeholder="Email" formControlName="email"
+              (change)="checkFormsValidity();">
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-control [nzSm]="16" [nzXs]="24">
+            <input class="input-field" nz-input id="password" placeholder="Password" formControlName="password"
+              (change)="checkFormsValidity();">
+          </nz-form-control>
+        </nz-form-item>
+        <button nz-button nzType="primary" (click)="checkFormsValidity(); submitClicked();">Submit</button>
+      </div>
+    </form>
+  </div>
 </div>

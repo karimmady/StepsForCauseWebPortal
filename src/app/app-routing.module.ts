@@ -1,12 +1,31 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Component } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { SignupFormComponent } from './signup-form/signup-form.component';
-
-const routes: Routes = [ 
+import { LandingPageComponent } from './landing-page/landing-page.component';
+import { AdminLoginComponent } from './admin-login/admin-login.component';
+import { LoginComponent } from './login/login.component';
+import { UserComponent } from './user/user.component';
+const routes: Routes = [
   {
     path: '',
+    component: LandingPageComponent
+  },
+  {
+    path: 'signup',
     component: SignupFormComponent
-  }
+  },
+  {
+    path: 'admin/login',
+    component: AdminLoginComponent
+  },
+  {
+    path: 'login',
+    component: LoginComponent
+  },
+  {
+    path: 'user',
+    component: UserComponent
+  },
 ];
 
 @NgModule({

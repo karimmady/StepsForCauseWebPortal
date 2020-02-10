@@ -1,17 +1,21 @@
 <nz-layout class="layout">
-  <nz-header style="position:fixed; width:100%; z-index: 3; background: #0076CE">
+  <nz-header>
     <div class="header__logo">
-      <img src="../../assets/dell_logo.png" height="24" width="183.88" />
+      <div class="islamic-affairs-wrapper">
+        <img src="../assets/islami_Affairs_logo.png" height="64" width="300">
+      </div>
+      <div class="zayed-wrapper">
+        <h2 class="zayed-title">Zayed Humanitarian Day<br>Love and Loyalty for Zayed<br>19 Ramadhan</h2>
+      </div>
+      <div class="dell-content">
+        <h2 class="dell-title">Powered by </h2>
+        <img src="../../assets/dell_logo.png" height="24" width="183.88" />
+      </div>
     </div>
     <ul nz-menu [nzTheme]="'dark'" [nzMode]="'horizontal'" style="line-height: 64px;"></ul>
   </nz-header>
-  <nz-content style="padding-top: 60px;">
-    <nz-layout style="padding:24px 0; background: #fff">
-      <nz-content style="padding: 0 24px; min-height: 750px; display: flex; flex-direction: column;">
-        <router-outlet></router-outlet>
-      </nz-content>
-    </nz-layout>
-    <span style="float: right; margin-right: 1%;"><I>For inquiries, please reach out to</I><I style="font-weight: bold"> dtmarathon@dell.com</I></span>
-    <app-footer></app-footer>
+  <nz-content>
+    <router-outlet></router-outlet>
   </nz-content>
+  <app-footer></app-footer>
 </nz-layout>
