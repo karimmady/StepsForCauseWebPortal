@@ -46,7 +46,7 @@ export class SignupFormComponent implements OnInit {
     ])
   });
 
-  constructor(private firebase: FirebaseService, db: AngularFireDatabase) {
+  constructor(private firebase: FirebaseService, db: AngularFireDatabase,private router: Router) {
     this.users = db.list('/users')
     this.com = this.users.valueChanges();
     this.com.subscribe(res => console.log(res))
@@ -60,11 +60,14 @@ export class SignupFormComponent implements OnInit {
 
   }
 
-  async submitClicked() {
-    await this.firebase.SignUp(this.signupForm.value.email, this.signupForm.value.password, this.signupForm.value.firstName, this.signupForm.value.lastName, 0).catch(err => {
+  async submitClicked() {   
+    await this.firebase.SignUp(this.signupForm.value.email, this.signupForm.value.password, this.signupForm.value.firstName, this.signupForm.value.lastName, 0).then(res =>{
+      alert("Please verify your email to login")
+      this.router.navigate(['/login'])
+    }).catch(err => {
       alert(err);
     })
-    alert("Please verify your email to login")
+    
   }
 }
 
