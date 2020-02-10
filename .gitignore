@@ -46,3 +46,5 @@ testem.log
 Thumbs.db
 # env
 /src/environments
+
+package-lock.json
