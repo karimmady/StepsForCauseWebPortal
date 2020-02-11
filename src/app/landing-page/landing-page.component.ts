@@ -24,7 +24,7 @@ export class LandingPageComponent implements OnInit {
     try {
       firebase.auth().onAuthStateChanged(function(user){
         if(user)
-          console.log(user)
+          // here we should check on the user if already logged in
         else
           console.log("no user")
       })
