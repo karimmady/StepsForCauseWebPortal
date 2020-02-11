@@ -40,6 +40,16 @@ export class FirebaseService {
 
     return user;
   }
+  
+  AddUser(userInfo){
+    this.dbref.push({
+      'uid':userInfo.uid,
+      'email':userInfo.email,
+      'stepCount':0,
+      'name':userInfo.displayName,
+      'photoURL':userInfo.photoURL
+    })
+  }
 
   SignOut() {
     this.angularFireAuth
@@ -62,5 +72,18 @@ export class FirebaseService {
 
   getUser() {
     return this.user;
+  }
+
+  async checkUserExists(email) {
+    var exists = false;
+    await this.dbref.once('value', async function (snapshot) {
+      await snapshot.forEach(function (childSnapshot) {
+        if (email == childSnapshot.val().email) {
+          exists = true;
+        }
+      })
+      console.log(exists)
+    });
+    return exists
   }
 }
