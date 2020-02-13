@@ -1,4 +1,14 @@
-<div class="outer-wrapper">
+<nz-spin class="page-when-loading" nzTip="Loading..." *ngIf="loading" [nzSize]="'large'">
+  <nz-card nzHoverable class="card" [nzCover]="coverTemplate">
+    <nz-card-meta class="card-content" nzTitle="Name" nzDescription="John Doe"></nz-card-meta>
+    <nz-card-meta class="card-content" nzTitle="Email" nzDescription="John@Doe.com"></nz-card-meta>
+    <nz-card-meta class="card-content" nzTitle="Step Count" nzDescription="292"></nz-card-meta>
+  </nz-card>
+  <ng-template #coverTemplate>
+    <img class="card-image" alt="" src="../../assets/default-profile.png" />
+  </ng-template>
+</nz-spin>
+<div class="outer-wrapper" *ngIf="!loading">
   <nz-card nzHoverable class="card" [nzCover]="coverTemplate">
     <nz-card-meta class="card-content" nzTitle="Name" nzDescription="{{user.name}}"></nz-card-meta>
     <nz-card-meta class="card-content" nzTitle="Email" nzDescription="{{user.email}}"></nz-card-meta>
@@ -11,6 +21,6 @@
     </div>
   </nz-card>
   <ng-template #coverTemplate>
-    <img class="card-image" alt="example" src="{{user.photo}}" />
+    <img class="card-image" src="{{user.photo}}" onerror="this.src='../../assets/default-profile.png'" />
   </ng-template>
 </div>

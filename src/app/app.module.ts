@@ -21,6 +21,7 @@ import { AdminLoginComponent } from './admin-login/admin-login.component';
 import { LoginComponent } from './login/login.component';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { UserComponent } from './user/user.component';
+import * as firebase from 'firebase';
 
 registerLocaleData(en);
 
@@ -50,4 +51,8 @@ registerLocaleData(en);
   providers: [AngularFireAuth, , AngularFireDatabaseModule, AngularFireModule, { provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor() {
+    firebase.initializeApp(environment.firebase)
+  }
+ }
