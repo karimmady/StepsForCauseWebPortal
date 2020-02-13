@@ -5,7 +5,6 @@ import * as firebase from 'firebase/app';
 import { environment } from "../../environments/environment"
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { FirebaseService } from '../services/firebase.service';
-firebase.initializeApp(environment.firebase);
 @Component({
   selector: 'app-landing-page',
   templateUrl: './landing-page.component.html',
@@ -14,37 +13,25 @@ firebase.initializeApp(environment.firebase);
 
 export class LandingPageComponent implements OnInit {
 
-  user:any;
+  user: any;
   db: AngularFireDatabase;
-  exists:any
-  loggedin:boolean
-  constructor(private router: Router, public afAuth: AngularFireAuth,private firebaseService: FirebaseService) {
-   }
-
-  async ngOnInit() {
-    try {
-      await firebase.auth().onAuthStateChanged(function(user){
-        if(user){
-          // this.firebaseService.setUser(user)
-          console.log(user) 
-          // this.loggedin = true;
-        }
-        else
-          console.log("no user")
-          // this.loggedin = false;
-      })
-    } catch (err) {
-      console.log(err)
-    }
+  exists: any
+  loggedin: boolean
+  constructor(private router: Router, public afAuth: AngularFireAuth, private firebaseService: FirebaseService) {
   }
-  loginPage() { 
-   this.router.navigate(['/login'])
+
+  ngOnInit() {
+ 
+  }
+  loginPage() {
+    this.signOut()
+    // this.router.navigate(['/login'])
   }
   async googleSignIn() {
     var provider = new firebase.auth.GoogleAuthProvider();
     this.user = await firebase.auth().signInWithPopup(provider).then(function (result) {
       // This gives you a Google Access Token. You can use it to access the Google API.
-      var token = result.credential.accessToken;
+      var token = result.credential["accessToken"];
       // The signed-in user info.
       var user = result.user;
       console.log(user)
@@ -61,10 +48,10 @@ export class LandingPageComponent implements OnInit {
       return
       // ...
     });
-    if(this.user){
+    if (this.user) {
       this.exists = await this.firebaseService.checkUserExists(this.user.email);
       console.log(this.exists)
-      if(!this.exists)
+      if (!this.exists)
         await this.firebaseService.AddUser(this.user)
       this.firebaseService.setUser(this.user)
       this.router.navigate(['/user'])
@@ -97,10 +84,10 @@ export class LandingPageComponent implements OnInit {
     this.router.navigate(['/signup'])
   }
 
-  signOut(){
-    firebase.auth().signOut().then(function() {
+  signOut() {
+    this.afAuth.auth.signOut().then(function () {
       console.log("sign out")
-    }).catch(function(error) {
+    }).catch(function (error) {
       // An error happened.
     });
   }
