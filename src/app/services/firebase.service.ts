@@ -42,7 +42,7 @@ export class FirebaseService {
   }
   
   AddUser(userInfo){
-    this.dbref.push({
+    this.dbref.child(userInfo.uid).set({
       'uid':userInfo.uid,
       'email':userInfo.email,
       'stepCount':0,

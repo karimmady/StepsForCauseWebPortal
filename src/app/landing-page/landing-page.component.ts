@@ -17,16 +17,21 @@ export class LandingPageComponent implements OnInit {
   user:any;
   db: AngularFireDatabase;
   exists:any
+  loggedin:boolean
   constructor(private router: Router, public afAuth: AngularFireAuth,private firebaseService: FirebaseService) {
    }
 
-  ngOnInit() {
+  async ngOnInit() {
     try {
-      firebase.auth().onAuthStateChanged(function(user){
-        if(user)
-          // here we should check on the user if already logged in
+      await firebase.auth().onAuthStateChanged(function(user){
+        if(user){
+          // this.firebaseService.setUser(user)
+          console.log(user)
+          // this.loggedin = true;
+        }
         else
           console.log("no user")
+          // this.loggedin = false;
       })
     } catch (err) {
       console.log(err)
