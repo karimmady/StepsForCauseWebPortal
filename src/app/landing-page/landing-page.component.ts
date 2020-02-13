@@ -21,11 +21,10 @@ export class LandingPageComponent implements OnInit {
   }
 
   ngOnInit() {
- 
+
   }
   loginPage() {
-    this.signOut()
-    // this.router.navigate(['/login'])
+    this.router.navigate(['/login'])
   }
   async googleSignIn() {
     var provider = new firebase.auth.GoogleAuthProvider();
@@ -88,7 +87,7 @@ export class LandingPageComponent implements OnInit {
     this.afAuth.auth.signOut().then(function () {
       console.log("sign out")
     }).catch(function (error) {
-      // An error happened.
+      console.log(error)
     });
   }
 
