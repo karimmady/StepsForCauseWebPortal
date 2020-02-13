@@ -26,7 +26,7 @@ export class LandingPageComponent implements OnInit {
       await firebase.auth().onAuthStateChanged(function(user){
         if(user){
           // this.firebaseService.setUser(user)
-          console.log(user)
+          console.log(user) 
           // this.loggedin = true;
         }
         else
