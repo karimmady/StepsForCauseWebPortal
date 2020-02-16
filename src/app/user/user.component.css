@@ -3,9 +3,10 @@
   flex: 1;
   flex-direction: column;
   height: 100%;
-  background-color: #D8D2D2;
+  background-color: #d8d2d2;
   max-height: 100%;
 }
+
 .outer-wrapper {
   display: flex;
   flex: 1;
@@ -14,6 +15,7 @@
   justify-content: center;
   height: 100%;
 }
+
 .page-when-loading {
   display: flex !important;
   flex: 1;
@@ -24,6 +26,7 @@
   width: 100%;
   height: 100%;
 }
+
 .card {
   max-width: 75%;
   align-self: center;
@@ -33,6 +36,7 @@
   margin: 10px 10px;
   box-shadow: 20px 20px;
 }
+
 .card-image {
   max-height: 100%;
   height: auto;
@@ -40,10 +44,12 @@
   max-width: 100%;
   margin: 0px;
 }
+
 .card-content {
   margin-bottom: 10px;
   width: fit-content;
 }
+
 .add-steps-wrapper {
   display: flex;
   flex-direction: column;

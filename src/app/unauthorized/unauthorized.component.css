@@ -1,0 +1,22 @@
+:host {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    align-items: center;
+    background-color: #d8d2d2;
+}
+
+.error-message {
+    font-weight: bold;
+}
+
+.access-denied-message {
+    font-size: 60px;
+}
+
+.italic-info {
+    cursor: pointer;
+    color: #0076ce;
+}

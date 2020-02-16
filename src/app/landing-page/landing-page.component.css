@@ -5,6 +5,7 @@
   flex: 1;
   flex-direction: column;
 }
+
 .bb {
   min-height: 100%;
   /* background-image: url("https://inside.dell.com/resources/statics/1355203/cq5dam.web.1280.1280.jpeg?a=1541377162507"); */
@@ -32,6 +33,16 @@
   background-color: rgba(255, 255, 255, 0.6);
 }
 
+.center-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  text-align: center;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+}
+
 .title {
   text-align: center;
   color: #0076ce;
@@ -40,24 +51,20 @@
   font-weight: bold;
 }
 
-.login-btn {
+.option-btn {
   width: 250px;
-  font-size: 30px;
+  font-size: 20px;
   height: 50px;
+  margin-bottom: 10px;
 }
 
 .signup-btn {
-  top: 25%;
   width: 250px;
   font-size: 20px;
   height: 50px;
 }
 
 .google-signup-btn {
-  top: 50%;
-  width: 250px;
-  font-size: 20px;
-  height: 50px;
   background-color: #ffffff;
   color: #0f9d58;
 }
@@ -68,10 +75,6 @@
 }
 
 .facebook-signup-btn {
-  top: 75%;
-  width: 250px;
-  font-size: 20px;
-  height: 50px;
   background-color: #ffffff;
   color: #6d84b4;
   padding: 0px 8px !important;

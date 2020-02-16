@@ -33,3 +33,23 @@ div.ant-card-cover {
 .ant-card-meta-description {
     font-size: 19px;
 }
+
+.ant-spin-blur {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.ant-spin-nested-loading > div > .ant-spin {
+  position: unset;
+}
+
+.ant-spin-nested-loading {
+  width: 100%;
+  height: 100%;
+}
+
+.ant-modal-body {
+  max-height: 400px;
+  overflow: scroll;
+}

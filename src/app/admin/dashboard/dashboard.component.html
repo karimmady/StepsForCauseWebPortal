@@ -1,0 +1,30 @@
+<nz-sider class="side-bar">
+  <ul nz-menu nzMode="inline" class="sider-menu side-bar-menu">
+    <li nz-menu-item nzSelected>Dashboard</li>
+    <li nz-menu-item [routerLink]="['/admin/create-admin']">Create Admin</li>
+    <li nz-menu-item [routerLink]="['/admin/create-user']">Create User</li>
+    <li nz-menu-item [routerLink]="['/admin/create-team']">Create Team</li>
+    <li nz-menu-item [routerLink]="['/admin/add-steps']">Add Steps</li>
+    <li nz-menu-item [routerLink]="['/admin/users']">Users</li>
+    <li nz-menu-item [routerLink]="['/admin/teams']">Teams</li>
+    <li nz-menu-item (click)="logout()">Logout</li>
+  </ul>
+</nz-sider>
+
+<div class="page-content-wrapper">
+  <div class="title">
+    <h1 class="title-text">Dashboard</h1>
+  </div>
+  <div>
+    <h1 class="steps-text">Total Steps</h1>
+    <h1 class="steps-text">{{totalSteps}}</h1>
+  </div>
+  <div>
+    <h1>Total Kilometers</h1>
+    <h1>{{totalKM}}</h1>
+  </div>
+  <div>
+    <h1>Total Money</h1>
+    <h1>{{totalMoney}} DHs</h1>
+  </div>
+</div>

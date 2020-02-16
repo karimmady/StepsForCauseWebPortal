@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+  background-color: #d8d2d2;
+}
+
+.login-form {
+  max-width: 300px;
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+.login-form-button {
+  width: 100%;
+}
+
+.center {
+  text-align: center;
+}

@@ -3,21 +3,14 @@
     <div class="center-page-wrapper">
       <div class="center-page">
         <h1 class="title">Walking for Good Cause</h1>
-      </div>
-      <div class="center-page">
-        <button class="login-btn" nz-button nzType="primary" (click)="loginPage();">Login</button>
-      </div>
-      <div class="center-page">
-        <button class="signup-btn" nz-button nzType="primary" (click)="signUpPage();">Sign up with Email</button>
-      </div>
-      <div class="center-page">
-        <button class="google-signup-btn" nz-button nzType="primary" (click)="googleSignIn();">
+        <button class="option-btn" nz-button nzType="primary" (click)="loginPage();">Login</button>
+        <button class="option-btn" nz-button nzType="primary" (click)="adminPage();">Login as Admin</button>
+        <button class="option-btn" nz-button nzType="primary" (click)="signUpPage();">Sign up with Email</button>
+        <button class="option-btn google-signup-btn" nz-button nzType="primary" (click)="googleSignIn();">
           <img class="social-media-logo" src="../assets/google_logo.png">
           Login with Google
         </button>
-      </div>
-      <div class="center-page">
-        <button class="facebook-signup-btn" nz-button nzType="primary" (click)="facebookSignIn();">
+        <button class="option-btn facebook-signup-btn" nz-button nzType="primary" (click)="facebookSignIn();">
           <img class="social-media-logo" src="../assets/Facebook_Logo.png">
           Login with Facebook
         </button>
