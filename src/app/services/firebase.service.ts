@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from "@angular/fire/auth";
 import { Observable, BehaviorSubject } from 'rxjs';
 import * as firebase from 'firebase';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,8 @@ export class FirebaseService {
       'uid': user.uid,
       'email': user.email,
       'stepCount': stepCount,
-      'name': firstName + " " + lastName
+      'name': firstName + " " + lastName,
+      'isAdmin': false
     })
 
     await user.sendEmailVerification();
@@ -39,6 +41,16 @@ export class FirebaseService {
       .signInWithEmailAndPassword(email, password)).user
 
     return user;
+  }
+  
+  AddUser(userInfo){
+    this.dbref.child(userInfo.uid).set({
+      'uid':userInfo.uid,
+      'email':userInfo.email,
+      'stepCount':0,
+      'name':userInfo.displayName,
+      'photoURL':userInfo.photoURL
+    })
   }
 
   SignOut() {
@@ -62,5 +74,18 @@ export class FirebaseService {
 
   getUser() {
     return this.user;
+  }
+
+  async checkUserExists(email) {
+    var exists = false;
+    await this.dbref.once('value', async function (snapshot) {
+      await snapshot.forEach(function (childSnapshot) {
+        if (email == childSnapshot.val().email) {
+          exists = true;
+        }
+      })
+      console.log(exists)
+    });
+    return exists
   }
 }

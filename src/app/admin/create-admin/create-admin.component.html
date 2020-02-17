@@ -1,0 +1,52 @@
+<nz-sider class="side-bar">
+  <ul nz-menu nzMode="inline" class="sider-menu side-bar-menu">
+    <li nz-menu-item [routerLink]="['/admin/dashboard']">Dashboard</li>
+    <li nz-menu-item nzSelected>Create Admin</li>
+    <li nz-menu-item [routerLink]="['/admin/create-user']">Create User</li>
+    <li nz-menu-item [routerLink]="['/admin/create-team']">Create Team</li>
+    <li nz-menu-item [routerLink]="['/admin/add-steps']">Add Steps</li>
+    <li nz-menu-item [routerLink]="['/admin/users']">Users</li>
+    <li nz-menu-item [routerLink]="['/admin/teams']">Teams</li>
+    <li nz-menu-item (click)="logout()">Logout</li>
+  </ul>
+</nz-sider>
+<div class="background-image">
+  <div class="page-content-wrapper">
+    <div class="form-title-wrapper">
+      <div class="title">
+        <h1 class="title-text">Create Admin</h1>
+      </div>
+      <div class="form-wrapper">
+        <form nz-form [formGroup]="signupForm">
+          <div class="center">
+            <nz-form-item>
+              <nz-form-control [nzSm]="26" [nzXs]="24">
+                <input class="input-field" nz-input id="firstName" placeholder="First Name" formControlName="firstName"
+                  (change)="checkFormsValidity();">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-control [nzSm]="26" [nzXs]="24">
+                <input class="input-field" nz-input id="lastName" placeholder="Last Name" formControlName="lastName"
+                  (change)="checkFormsValidity();">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-control [nzSm]="26" [nzXs]="24">
+                <input class="input-field" nz-input id="email" placeholder="Email" formControlName="email"
+                  (change)="checkFormsValidity();">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-control [nzSm]="26" [nzXs]="24">
+                <input class="input-field" nz-input id="password" placeholder="Password" formControlName="password"
+                  (change)="checkFormsValidity();">
+              </nz-form-control>
+            </nz-form-item>
+            <button nz-button nzType="primary" (click)="checkFormsValidity(); submitClicked();">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

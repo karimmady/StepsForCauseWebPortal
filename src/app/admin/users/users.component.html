@@ -1,0 +1,115 @@
+<nz-sider class="side-bar">
+  <ul nz-menu nzMode="inline" class="sider-menu side-bar-menu">
+    <li nz-menu-item [routerLink]="['/admin/dashboard']">Dashboard</li>
+    <li nz-menu-item [routerLink]="['/admin/create-admin']">Create Admin</li>
+    <li nz-menu-item [routerLink]="['/admin/create-user']">Create User</li>
+    <li nz-menu-item [routerLink]="['/admin/create-team']">Create Team</li>
+    <li nz-menu-item [routerLink]="['/admin/add-steps']">Add Steps</li>
+    <li nz-menu-item nzSelected>Users</li>
+    <li nz-menu-item [routerLink]="['/admin/teams']">Teams</li>
+    <li nz-menu-item (click)="logout()">Logout</li>
+  </ul>
+</nz-sider>
+<div class="page-content-wrapper">
+  <div class="title">
+    <h1 class="title-text">Users</h1>
+  </div>
+  <nz-spin class="page-when-loading" nzTip="Loading..." *ngIf="loading" [nzSize]="'large'">
+    <nz-table #basicTable [nzData]="users" [nzScroll]="{ x: '700px', y: '320px' }">
+      <thead>
+        <tr>
+          <th nzWidth='150px' style="text-align: center;">Name</th>
+          <th nzWidth='150px' style="text-align: center;">Email</th>
+          <th nzWidth='80px' style="text-align: center;">Step Count</th>
+          <th nzWidth='150px' style="text-align: center;">Team</th>
+          <th nzWidth='150px' style="text-align: center;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data">
+          <td nzWidth='150px' style="text-align: center;">{{data.name}}</td>
+          <td nzWidth='150px' style="text-align: center;">{{data.email}}</td>
+          <td nzWidth='80px' style="text-align: center;">{{data.stepCount}}</td>
+          <td nzWidth='150px' style="text-align: center;" *ngIf="data.team">{{data.team}}</td>
+          <td nzWidth='150px' style="text-align: center;" *ngIf="!data.team">-</td>
+          <td nzWidth='150px' style="text-align: center;">
+            <a (click)="showModalSteps(data.email)">Add Steps</a>
+            <nz-divider nzType="vertical"></nz-divider>
+            <a (click)="showModalDelete(data.uid)">Delete</a>
+            <nz-divider nzType="vertical"></nz-divider>
+            <a *ngIf="data.isAdmin" (click)="changeAdminStatus(data.email, false)">Revoke Admin</a>
+            <a *ngIf="!data.isAdmin" (click)="changeAdminStatus(data.email, true)">Make Admin</a>
+            <nz-divider nzType="vertical"></nz-divider>
+            <a *ngIf="data.team" (click)="showModalTeamRemove(data.email, data.team)">Remove From Team</a>
+            <a *ngIf="!data.team" (click)="showModalTeamAdd(data.email)">Add To Team</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-spin>
+
+  <div *ngIf="!loading">
+    <nz-table #basicTable [nzData]="users" [nzScroll]="{ x: '700px', y: '320px' }">
+      <thead>
+        <tr>
+          <th nzWidth='150px' style="text-align: center;">Name</th>
+          <th nzWidth='150px' style="text-align: center;">Email</th>
+          <th nzWidth='80px' style="text-align: center;">Step Count</th>
+          <th nzWidth='150px' style="text-align: center;">Team</th>
+          <th nzWidth='150px' style="text-align: center;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data">
+          <td nzWidth='150px' style="text-align: center;">{{data.name}}</td>
+          <td nzWidth='150px' style="text-align: center;">{{data.email}}</td>
+          <td nzWidth='80px' style="text-align: center;">{{data.stepCount}}</td>
+          <td nzWidth='150px' style="text-align: center;" *ngIf="data.team">{{data.team}}</td>
+          <td nzWidth='150px' style="text-align: center;" *ngIf="!data.team">-</td>
+          <td nzWidth='150px' style="text-align: center;">
+            <a (click)="showModalSteps(data.email)">Add Steps</a>
+            <nz-divider nzType="vertical"></nz-divider>
+            <a (click)="showModalDelete(data.uid)">Delete</a>
+            <nz-divider nzType="vertical"></nz-divider>
+            <a *ngIf="data.isAdmin" (click)="changeAdminStatus(data.email, false)">Revoke Admin</a>
+            <a *ngIf="!data.isAdmin" (click)="changeAdminStatus(data.email, true)">Make Admin</a>
+            <nz-divider nzType="vertical"></nz-divider>
+            <a *ngIf="data.team" (click)="showModalTeamRemove(data.email, data.team)">Remove From Team</a>
+            <a *ngIf="!data.team" (click)="showModalTeamAdd(data.email)">Add To Team</a>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<nz-modal [(nzVisible)]="isVisibleDelete" nzTitle="Delete User" (nzOnCancel)="handleCancelDelete()"
+  (nzOnOk)="deleteUser()">
+  <p>Are you sure you want to delete user? This action cannot be undone.</p>
+</nz-modal>
+
+<nz-modal [(nzVisible)]="isVisibleSteps" nzTitle="Add Steps" (nzOnCancel)="handleCancelSteps()" (nzOnOk)="addSteps()">
+  <form nz-form [formGroup]="addStepsForm">
+    <nz-form-item>
+      <nz-form-control [nzSm]="10" [nzXs]="24">
+        <input class="input-field" nz-input id="firstName" placeholder="Steps To Be Added" formControlName="steps">
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+</nz-modal>
+
+<nz-modal [(nzVisible)]="isVisibleTeamAdd" nzTitle="Add User to Team" (nzOnCancel)="handleCancleTeamAdd()"
+  (nzOnOk)="addUserToTeam()">
+  <form nz-form [formGroup]="addToTeamForm">
+    <nz-form-item>
+      <nz-form-control [nzSm]="10" [nzXs]="24">
+        <input class="input-field" nz-input id="firstName" placeholder="Team Name" formControlName="teamName">
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+</nz-modal>
+
+<nz-modal [(nzVisible)]="isVisibleTeamRemove" nzTitle="Remove User From Team" (nzOnCancel)="handleCancleTeamRemove()"
+  (nzOnOk)="removeUserFromTeam()">
+  <p>Are you sure you want to remove user from their team: {{selectedTeamNameRemove}}?</p>
+</nz-modal>

@@ -9,6 +9,7 @@
 
 # dependencies
 /node_modules
+/admin-service/node_modules
 
 # profiling files
 chrome-profiler-events*.json
@@ -48,3 +49,4 @@ Thumbs.db
 /src/environments
 
 package-lock.json
+steps-for-cause-firebase-adminsdk-hnxxk-70b972bec0.json

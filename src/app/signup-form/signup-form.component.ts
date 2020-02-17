@@ -5,9 +5,8 @@ import {
   FormControl,
   Validators,
 } from '@angular/forms';
-import { NzModalService } from 'ng-zorro-antd';
-import { Router } from "@angular/router";
 import { FirebaseService } from '../services/firebase.service';
+import { Router } from '@angular/router';
 class User {
   constructor(public firstName, public lastName, public email, public password) { }
 }
@@ -46,7 +45,7 @@ export class SignupFormComponent implements OnInit {
     ])
   });
 
-  constructor(private firebase: FirebaseService, db: AngularFireDatabase) {
+  constructor(private router: Router, private firebase: FirebaseService, db: AngularFireDatabase) {
     this.users = db.list('/users')
     this.com = this.users.valueChanges();
     this.com.subscribe(res => console.log(res))
@@ -61,10 +60,14 @@ export class SignupFormComponent implements OnInit {
   }
 
   async submitClicked() {
-    await this.firebase.SignUp(this.signupForm.value.email, this.signupForm.value.password, this.signupForm.value.firstName, this.signupForm.value.lastName, 0).catch(err => {
+    await this.firebase.SignUp(this.signupForm.value.email, this.signupForm.value.password, this.signupForm.value.firstName, this.signupForm.value.lastName, 0).then(res => {
+      alert("Please verify your email to login")
+      this.router.navigate(['/login'])
+      this.router.navigate
+    }).catch(err => {
       alert(err);
     })
-    alert("Please verify your email to login")
+
   }
 }
 

@@ -1,0 +1,37 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  height: 100%;
+  background-color: #d8d2d2;
+}
+
+.side-bar {
+  background: #f0f2f5;
+}
+
+.side-bar-menu {
+  background: #f0f2f5;
+  padding-top: 25%;
+}
+
+.page-content-wrapper {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.title {
+  width: 100%;
+  height: fit-content;
+  text-align: center;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.title-text {
+  color: #0076ce;
+  margin: 0px;
+}

@@ -26,7 +26,7 @@
         <nz-form-item>
           <nz-form-control [nzSm]="16" [nzXs]="24">
             <input class="input-field" nz-input id="password" placeholder="Password" formControlName="password"
-              (change)="checkFormsValidity();">
+              type="password" (change)="checkFormsValidity();">
           </nz-form-control>
         </nz-form-item>
         <button nz-button nzType="primary" (click)="checkFormsValidity(); submitClicked();">Submit</button>

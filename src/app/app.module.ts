@@ -17,10 +17,21 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { environment } from '../environments/environment';
-import { AdminLoginComponent } from './admin-login/admin-login.component';
+import { AdminLoginComponent } from './admin/admin-login/admin-login.component';
 import { LoginComponent } from './login/login.component';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { UserComponent } from './user/user.component';
+import { DashboardComponent } from './admin/dashboard/dashboard.component';
+import { CreateUserComponent } from './admin/create-user/create-user.component';
+import { CreateTeamComponent } from './admin/create-team/create-team.component';
+import { AddStepsComponent } from './admin/add-steps/add-steps.component';
+import { UsersComponent } from './admin/users/users.component';
+import { CreateAdminComponent } from './admin/create-admin/create-admin.component';
+import { AuthService } from './services/auth.service';
+import { AuthGuard } from './auth.guard';
+import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
+import * as firebase from 'firebase';
+import { TeamsComponent } from './admin/teams/teams.component';
 
 registerLocaleData(en);
 
@@ -33,6 +44,14 @@ registerLocaleData(en);
     AdminLoginComponent,
     LoginComponent,
     UserComponent,
+    DashboardComponent,
+    CreateUserComponent,
+    CreateTeamComponent,
+    AddStepsComponent,
+    UsersComponent,
+    CreateAdminComponent,
+    UnauthorizedComponent,
+    TeamsComponent,
   ],
   imports: [
     BrowserModule,
@@ -47,7 +66,11 @@ registerLocaleData(en);
     AngularFireModule.initializeApp(environment.firebase, 'steps-for-cause'),
     AngularFireDatabaseModule,
   ],
-  providers: [AngularFireAuth, , AngularFireDatabaseModule, AngularFireModule, { provide: NZ_I18N, useValue: en_US }],
+  providers: [AngularFireAuth, , AngularFireDatabaseModule, AngularFireModule, AuthService, AuthGuard, { provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor() {
+    firebase.initializeApp(environment.firebase);
+  }
+} 
