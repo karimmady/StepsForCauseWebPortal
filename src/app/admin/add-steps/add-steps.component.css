@@ -1,0 +1,64 @@
+:host {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    height: 100%;
+    background-color: #d8d2d2;
+}
+
+.side-bar {
+    background: #f0f2f5;
+}
+
+.side-bar-menu {
+    background: #f0f2f5;
+    padding-top: 25%;
+}
+
+.background-image {
+    width: 100%;
+    min-height: 100%;
+    background: url("src/assets/background.jpeg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    position: relative;
+    z-index: 0;
+}
+
+.page-content-wrapper {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+.form-title-wrapper {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.title {
+    width: 100%;
+    height: fit-content;
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.title-text {
+    color: #0076ce;
+    margin: 0px;
+}
+
+.form-wrapper {
+    align-self: center;
+}
+
+.center {
+    text-align: center;
+}

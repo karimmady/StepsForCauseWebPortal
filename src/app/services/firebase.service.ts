@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from "@angular/fire/auth";
 import { Observable, BehaviorSubject } from 'rxjs';
 import * as firebase from 'firebase';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,8 @@ export class FirebaseService {
       'uid': user.uid,
       'email': user.email,
       'stepCount': stepCount,
-      'name': firstName + " " + lastName
+      'name': firstName + " " + lastName,
+      'isAdmin': false
     })
 
     await user.sendEmailVerification();

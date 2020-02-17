@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FirebaseService } from '../services/firebase.service';
 import { UserService } from '../services/user.service';
 import { AngularFireDatabase } from 'angularfire2/database';
+import { AuthService } from '../services/auth.service';
 
 
 @Component({
@@ -15,10 +16,11 @@ export class LoginComponent implements OnInit {
   validateForm: FormGroup;
 
   constructor(private fb: FormBuilder,
-    public router: Router, private firebase: FirebaseService, private userService: UserService
+    public router: Router, private firebase: FirebaseService, private authService: AuthService
   ) { }
 
   ngOnInit() {
+    this.authService.SignOut();
     this.validateForm = this.fb.group({
       userName: [null, [Validators.required]],
       password: [null, [Validators.required]],
@@ -31,9 +33,9 @@ export class LoginComponent implements OnInit {
       if (res.emailVerified) {
         this.firebase.setUser(res);
         this.router.navigate(['/user'])
+      } else {
+        alert ("It seems like you have not yet verified your email")
       }
-      else
-        alert("Please verify your email to login")
     }).catch(err => {
       alert(err);
     })

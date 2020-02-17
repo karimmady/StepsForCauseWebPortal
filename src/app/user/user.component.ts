@@ -13,39 +13,43 @@ export class UserComponent implements OnInit {
   user: firebase.User;
   addSteps = false;
   steps: number;
-  loading = true;
+  loading: boolean;
 
   constructor(private firebase: FirebaseService, private db: AngularFireDatabase) { }
 
   async ngOnInit() {
     this.loading = true;
-    var fb_user = await this.firebase.getUser();
+    try {
+      var fb_user = await this.firebase.getUser();
 
-    this.db.list('users').valueChanges().subscribe(users => {
-      users.map(async (u: firebase.User) => {
-        if (u.uid === fb_user.uid) {
-          this.user = u;
-          this.loading = false;
-          if (this.user["photo"] == undefined && this.user.photoURL) {
-            await this.getBase64ImageFromURL(this.user.photoURL).subscribe(async base64data => {
-              this.user["photo"] = ('data:image/jpg;base64,' + base64data);
-            });
+      this.db.list('users').valueChanges().subscribe(users => {
+        users.map(async (u: firebase.User) => {
+          if (u.uid === fb_user.uid) {
+            this.user = u;
+            this.loading = false;
+            if (this.user["photo"] == undefined && this.user.photoURL) {
+              await this.getBase64ImageFromURL(this.user.photoURL).subscribe(async base64data => {
+                this.user["photo"] = ('data:image/jpg;base64,' + base64data);
+              });
+            }
+            console.log(this.user)
           }
-          console.log(this.user)
-        }
+        })
       })
-    })
+    }
+    catch (err) {
+      console.log("Current user has not been retreived yet which led to the following error")
+      console.log(err)
+    }
   }
 
   toggleAddSteps() {
     this.addSteps = !this.addSteps;
-    console.log(this.user)
   }
 
   async submit() {
     this.loading = true;
     await this.firebase.updateStepCount(this.user, this.user["stepCount"], this.steps).then(res => {
-      console.log(res);
       this.db.list('users').valueChanges().subscribe(users => {
         users.map(async (u: firebase.User) => {
           if (u.uid === this.user.uid) {
@@ -61,7 +65,6 @@ export class UserComponent implements OnInit {
         })
       })
     });
-
   }
 
   getBase64ImageFromURL(url: string) {
