@@ -14,6 +14,7 @@ import { CreateAdminComponent } from './admin/create-admin/create-admin.componen
 import { AuthGuard } from './auth.guard';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import { TeamsComponent } from './admin/teams/teams.component';
+import { CountdownComponent } from './countdown/countdown.component';
 const routes: Routes = [
   {
     path: '',
@@ -73,6 +74,10 @@ const routes: Routes = [
   {
     path: 'unauthorized',
     component: UnauthorizedComponent
+  },
+  {
+    path: 'countdown',
+    component: CountdownComponent
   }
 ];
 
