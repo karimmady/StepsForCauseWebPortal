@@ -4,7 +4,7 @@ const helmet = require("helmet");
 const bodyParser = require('body-parser');
 const app = express();
 const admin = require("firebase-admin");
-const serviceAccount = require("./steps-for-cause-firebase-adminsdk-hnxxk-70b972bec0.json");
+const serviceAccount = require("./steps-for-cause-firebase-adminsdk-hnxxk-ef03407863.json");
 const utils = require("./utils");
 
 admin.initializeApp({

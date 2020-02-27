@@ -40,11 +40,13 @@ export class LandingPageComponent implements OnInit {
       var token = result.credential["accessToken"];
       // The signed-in user info.
       var user = result.user;
-      console.log(user)
       return user
     }).catch(function (error) {
       // Handle Errors here.
       var errorCode = error.code;
+      if (errorCode === 'auth/account-exists-with-different-credential') {
+        alert("This email logged in using different credentials")
+      }
       var errorMessage = error.message;
       // The email of the user's account used.
       var email = error.email;
@@ -56,7 +58,6 @@ export class LandingPageComponent implements OnInit {
     });
     if (this.user) {
       this.exists = await this.firebaseService.checkUserExists(this.user.email);
-      console.log(this.exists)
       if (!this.exists)
         await this.firebaseService.AddUser(this.user)
       this.firebaseService.setUser(this.user)
@@ -67,25 +68,35 @@ export class LandingPageComponent implements OnInit {
 
   }
 
-  facebookSignIn() {
+  async facebookSignIn() {
     var provider = new firebase.auth.FacebookAuthProvider();
-    firebase.auth().signInWithPopup(provider).then(function (result) {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      // var token = result.credential.accessToken;
-      // The signed-in user info.
+    this.user = await firebase.auth().signInWithPopup(provider).then(function (result) {
+      var token = result.credential["accessToken"];
       var user = result.user;
-      console.log(user)
-      // ...
+      return user;
     }).catch(function (error) {
       // Handle Errors here.
       var errorCode = error.code;
+      if (errorCode === 'auth/account-exists-with-different-credential') {
+        alert("This email logged in using different credentials")
+      }
       var errorMessage = error.message;
       // The email of the user's account used.
       var email = error.email;
       // The firebase.auth.AuthCredential type that was used.
       var credential = error.credential;
-      // ...
+      return
     });
+    if (this.user) {
+      this.exists = await this.firebaseService.checkUserExists(this.user.email);
+      if (!this.exists)
+        await this.firebaseService.AddUser(this.user)
+      this.firebaseService.setUser(this.user)
+      this.router.navigate(['/user'])
+    }
+    else
+      console.log("error")
+
   }
 
   signUpPage() {
