@@ -15,6 +15,7 @@ import { AuthGuard } from './auth.guard';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import { TeamsComponent } from './admin/teams/teams.component';
 import { StatisticsPageComponent } from './statistics-page/statistics-page.component';
+import { CountdownComponent } from './countdown/countdown.component';
 const routes: Routes = [
   {
     path: '',
@@ -76,8 +77,13 @@ const routes: Routes = [
     component: UnauthorizedComponent
   },
   {
+<<<<<<< HEAD
     path: 'statistics',
     component: StatisticsPageComponent
+=======
+    path: 'countdown',
+    component: CountdownComponent
+>>>>>>> 4ad04aa7a9f79fe2c905db73a590a1f2549d4427
   }
 ];
 
