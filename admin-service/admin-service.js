@@ -4,14 +4,14 @@ const helmet = require("helmet");
 const bodyParser = require('body-parser');
 const app = express();
 const admin = require("firebase-admin");
-const serviceAccount = require("./steps-for-cause-firebase-adminsdk-hnxxk-ef03407863.json");
+const serviceAccount = require("./steps-for-cause-firebase-adminsdk-hnxxk-70b972bec0.json");
 const utils = require("./utils");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://steps-for-cause.firebaseio.com"
 });
-const db = admin.database().ref('/users');
+const db = admin.firestore();
 
 app.use(bodyParser.json({ limit: '160mb', extended: true }));
 app.use(helmet());
@@ -27,19 +27,19 @@ app.post('/admins', async (req, res) => {
             email: req.body.email,
             emailVerified: true,
             password: req.body.password,
-        })
+        });
 
-        await db.child(user.uid).update({
+        await db.collection('users').doc(user.uid).set({
             'uid': user.uid,
             'email': user.email,
             'stepCount': req.body.stepCount,
             'name': req.body.firstName + " " + req.body.lastName,
             'isAdmin': true
-        })
+        });
     } catch (err) {
-        res.status(500).send(err)
+        res.status(500).send(err);
     }
-    res.status(200).send(user)
+    res.status(200).send(user);
 });
 
 app.post('/users', async (req, res) => {
@@ -48,267 +48,256 @@ app.post('/users', async (req, res) => {
             email: req.body.email,
             emailVerified: true,
             password: req.body.password,
-        })
+        });
 
-        await db.child(user.uid).update({
+        await db.collection('users').doc(user.uid).set({
             'uid': user.uid,
             'email': user.email,
             'stepCount': req.body.stepCount,
             'name': req.body.firstName + " " + req.body.lastName,
             'isAdmin': false
-        })
+        });
     } catch (err) {
-        res.status(500).send(err)
+        res.status(500).send(err);
     }
-    res.status(200).send(user)
+    res.status(200).send(user);
 });
 
 app.put('/users', async (req, res) => {
-    db.orderByChild("email").equalTo(req.body.email).once("value", async function (snapshot) {
-        try {
-            if (snapshot.exists()) {
-                const uid = Object.keys(snapshot.val())[0];
-                await db.child(uid).update({ 'stepCount': +snapshot.val()[uid].stepCount + +req.body.addedStepCount })
-                    .finally(() => {
-                        res.status(200).send({ "message": "Steps updated" });
-                    })
-            } else
-                res.status(404).send({ "code": "auth/email not found", "message": "The email does not exist or has been deleted" });
-        } catch (err) {
-            res.status(500).send({ "code": "type/invalid step count", "message": "The step count entered is of an invalid data type" });
-        }
-    })
-})
+    db.collection('users').doc(req.body.id).get().then(user => {
+        if (!user.exists) {
+            db.collection('teams').where('teamName', '==', req.body.teamName).get().then(teams => {
+                teams.forEach(team => {
+                    db.collection('teams').doc(team.id).collection('members').doc(req.body.id).get().then((user) => {
+                        if (!user.exists)
+                            throw ({ "code": "auth/id not found", "message": "The id does not exist or has been deleted" });
+                        else {
+                            let data = user.data();
+                            let newSteps = data.stepCount + req.body.addedStepCount
+                            if (isNaN(newSteps))
+                                throw ({ "code": "type/invalid step count", "message": "The step count entered is of an invalid data type" });
+                            else {
+                                user.ref.update({
+                                    'stepCount': newSteps
+                                })
+                                let data = team.data();
+                                let newStepsTeam = data.totalSteps + req.body.addedStepCount
 
-app.put('/users/change-isAdmin', async (req, res) => {
-    db.orderByChild("email").equalTo(req.body.email).once("value", async function (snapshot) {
-        try {
-            if (snapshot.exists()) {
-                const uid = Object.keys(snapshot.val())[0];
-                await db.child(uid).update({ 'isAdmin': req.body.isAdmin })
-                    .finally(() => {
-                        res.status(200).send({ "message": "User updated" });
+                                team.ref.update({
+                                    'totalSteps': newStepsTeam
+                                })
+                                res.status(200).send({ "message": "Steps updated" });
+                            }
+                        }
+                    }).catch(err => {
+                        res.status(500).send(err);
                     })
-            } else
-                res.status(404).send({ "code": "auth/email not found", "message": "The email does not exist or has been deleted" });
-        } catch (err) {
-            res.status(500).send({ "code": "500", "message": "Internal server error" });
-        }
-    })
-})
-
-app.delete('/users', async (req, res) => {
-    await admin.auth().deleteUser(req.query.id)
-        .then(async () => {
-            await db.child(req.query.id).remove().then(() => {
-                res.status(200).send({ "message": "User deleted" })
-            }).catch(err => {
-                res.status(500).send(err);
+                })
             })
-        }).catch(err => {
-            res.status(500).send(err);
-        });
-})
-
-app.post('/teams', async (req, res) => {
-    const teamdb = admin.database().ref('/teams');
-    var teamExisits = false;
-    await teamdb.orderByChild('teamName').equalTo(req.body.teamName).once("value", async function (snapshot) {
-        try {
-            if (snapshot.exists()) {
-                const team_id = Object.keys(snapshot.val())[0]
-                throw "The team name you have chosen is already in user by some other team";
-            }
-        } catch (err) {
-            teamExisits = true;
-            res.status(400).send({ "code": "auth/team exists", "message": err });
-        }
-    })
-        .then(async () => {
-            if (!teamExisits) {
-                const ref = await teamdb.push();
-                await ref.update({ "teamName": req.body.teamName, "users": [] });
-                res.status(200).send({ "message": "Team created" });
-            }
-        })
-})
-
-app.put('/teams/add-user', async (req, res) => {
-    const teamdb = admin.database().ref('/teams');
-    let user
-    let uid
-    var userInTeam = false;
-    var userExists = true;
-    await db.orderByChild('email').equalTo(req.body.email).once("value", async function (snapshot) {
-        if (snapshot.exists()) {
-            uid = Object.keys(snapshot.val())[0];
-            user = snapshot.val()[uid]
-            try {
-                if (snapshot.val()[uid].team) {
-                    throw "This user is already in a team, if you would like to change that then please remove the user from their current team first"
-                }
-            } catch (err) {
-                userInTeam = true;
-                res.status(400).send({ "code": "auth/user in team", "message": err });
-            }
         } else {
-            userExists = false;
-            res.status(400).send({ "code": "auth/email not found", "message": "The email does not exist or has been deleted" })
-        }
-    })
-
-    if (userExists && !userInTeam) {
-        await teamdb.orderByChild('teamName').equalTo(req.body.teamName).once("value", async function (snapshot) {
-            if (snapshot.exists()) {
-                const team_id = Object.keys(snapshot.val())[0];
-                var users = snapshot.val()[team_id].users;
-                if (users) {
-                    users.push(user);
-                } else {
-                    users = [];
-                    users.push(user);
-                }
-                await db.child(uid).update({ "team": req.body.teamName }).then(async () => {
-                    await teamdb.child(team_id).update({ "users": users }).then(async () => {
-                        res.status(200).send({ "message": "Team updated" });
-                    })
+            let data = user.data();
+            let newSteps = data.stepCount + req.body.addedStepCount
+            if (isNaN(newSteps))
+                throw ({ "code": "type/invalid step count", "message": "The step count entered is of an invalid data type" });
+            else {
+                user.ref.update({
+                    'stepCount': newSteps
                 })
-            } else {
-                res.status(404).send({ "code": "auth/team not found", "message": "The team does not exist or has been deleted" });
+                res.status(200).send({ "message": "Steps updated" });
             }
-        })
-    }
-})
-
-app.put('/teams/remove-user', async (req, res) => {
-    const teamdb = admin.database().ref('/teams');
-    let uid
-    let user
-    var userInTeam = true;
-    var userExists = true;
-    await db.orderByChild('email').equalTo(req.body.email).once("value", async function (snapshot) {
-        if (snapshot.exists()) {
-            uid = Object.keys(snapshot.val())[0];
-            user = snapshot.val()[uid];
-            try {
-                if (!snapshot.val()[uid].team) {
-                    throw "This user does not have a team"
-                }
-            } catch (err) {
-                userInTeam = false;
-                res.status(400).send({ "code": "auth/user not in team", "message": err });
-            }
-        } else {
-            userExists = false;
-            res.status(400).send({ "code": "auth/email not found", "message": "The email does not exist or has been deleted" })
         }
-    })
-
-    if (userExists && userInTeam) {
-        await teamdb.orderByChild('teamName').equalTo(req.body.teamName).once("value", async function (snapshot) {
-            try {
-                if (snapshot.exists()) {
-                    const team_id = Object.keys(snapshot.val())[0];
-                    var users = snapshot.val()[team_id].users;
-
-                    const userToRemoveIndex = users.map(function (u) {
-                        return u.email;
-                    }).indexOf(user.email)
-
-                    if (userToRemoveIndex > -1) {
-                        users.splice(userToRemoveIndex, 1);
-                    } else {
-                        throw "The user does not exist in this team"
-                    }
-                    await teamdb.child(team_id).update({ "users": users });
-                    await db.child(uid).child('team').remove()
-                        .then(() => {
-                            res.status(200).send({ "message": "User removed" });
-                        })
-                } else {
-                    res.status(404).send({ "code": "auth/team not found", "message": "The team does not exist or has been deleted" });
-                }
-            } catch (err) {
-                res.status(400).send({ "code": "auth/user not in team", "message": err });
-            }
-        })
-    }
-})
-
-app.delete('/teams', async (req, res) => {
-    const teamdb = admin.database().ref('/teams');
-
-    await teamdb.orderByChild('teamName').equalTo(req.query.teamName).once("value", async function (snapshot) {
-        try {
-            if (snapshot.exists()) {
-                db.orderByChild('team').equalTo(req.query.teamName).on("value", async function (snapshot) {
-                    snapshot.forEach(async function (data) {
-                        await db.child(data.key).child("team").remove();
-                    })
-                })
-                const team_id = Object.keys(snapshot.val())[0];
-
-                await teamdb.child(team_id).remove()
-                    .then(() => {
-                        res.status(200).send({ "message": "Team deleted" });
-                    })
-            } else
-                res.status(404).send({ "code": "auth/team not found", "message": "The team does not exist or has been deleted" });
-        } catch (err) {
-            res.status(404).send({ "code": "auth/500", "message": "Internal server error" });
-        }
+    }).catch(err => {
+        res.status(500).send(err);
     });
 })
 
-app.get('/teams', async (req, res) => {
-    const teamdb = admin.database().ref('/teams');
-    var teams = [];
-    var temp = [];
-    var teamIDs = [];
-    var i = 0;
-    await teamdb.once("value", function (data) {
-        try {
-            teams = Object.values(data.toJSON());
-            teamIDs = Object.keys(data.toJSON());
-            temp = teams.map(async team => {
-                var totalSteps = 0;
-                var users = [];
-                var updatedUsers = [];
-
-                try {
-                    users = Object.values(team.users)
-                    var steps = await users.map(async u => {
-                        await db.orderByChild('email').equalTo(u.email).once("value", function (snapshot) {
-                            totalSteps += snapshot.val()[u.uid].stepCount
-                            updatedUsers.push(snapshot.val()[u.uid])
-                            return totalSteps;
-                        })
-                    })
-                    await Promise.all(steps);
-
-                    var obj = {
-                        "teamName": team.teamName,
-                        "users": updatedUsers,
-                        "totalSteps": totalSteps
-                    }
-                    await teamdb.child(teamIDs[i++]).update({ "users": updatedUsers })
-                    return obj
-
-                } catch (err) {
-                    var obj = {
-                        "teamName": team.teamName,
-                        "users": updatedUsers,
-                        "totalSteps": totalSteps
-                    }
-                    await teamdb.child(teamIDs[i++]).update({ "users": updatedUsers })
-                    return obj;
-                }
+app.put('/users/change-isAdmin', async (req, res) => {
+    db.collection('users').doc(req.body.id).get().then(user => {
+        if (!user.exists) {
+            if (!req.body.teamName)
+                throw ({ "code": "auth/id not found", "message": "The id does not exist or has been deleted" });
+            db.collection('teams').where('teamName', '==', req.body.teamName).get().then(teams => {
+                teams.forEach(team => {
+                    db.collection('teams').doc(team.id).collection('members').doc(req.body.id).get().then((user) => {
+                        if (!user.exists)
+                            throw ({ "code": "auth/id not found", "message": "The id does not exist or has been deleted" });
+                        else {
+                            user.ref.update({
+                                'isAdmin': req.body.isAdmin
+                            })
+                            res.status(200).send({ "message": "User updated" });
+                        }
+                    }).catch(err => {
+                        res.status(500).send(err);
+                    });
+                })
             })
-        } catch (err) { }
-    }).then(async () => {
-        var result = await Promise.all(temp);
-        res.status(200).send({ "data": result })
+        } else {
+            user.ref.update({
+                'isAdmin': req.body.isAdmin
+            })
+            res.status(200).send({ "message": "User updated" });
+        }
+    }).catch(err => {
+        res.status(500).send(err);
+    });
+})
+
+app.delete('/users', async (req, res) => {
+    admin.auth().deleteUser(req.query.id).then(() => {
+        db.collection('users').doc(req.query.id).get().then(user => {
+            if (user.exists) {
+                user.ref.delete();
+                res.status(200).send({ 'message': 'User deleted' });
+            } else
+                throw "invalid"
+        }).catch(err => {
+            db.collectionGroup('members').where('uid', '==', req.query.id).get().then(users => {
+                if (users.empty)
+                    throw ({ "code": "auth/id not found", "message": "The id does not exist or has been deleted" });
+                else {
+                    users.forEach(user => {
+                        let teamID = user.data().team;
+                        db.collection('teams').doc(teamID).get().then(team => {
+                            let newSteps = team.data().totalSteps - user.data().stepCount
+                            team.ref.update({
+                                'totalSteps': newSteps
+                            })
+                        })
+                        user.ref.delete();
+                        res.status(200).send({ 'message': 'User deleted' });
+                    })
+                }
+            }).catch(err => {
+                res.status(500).send(err);
+            })
+        })
+    }).catch(err => {
+        res.status(500).send(err);
     })
+})
+
+app.post('/teams', async (req, res) => {
+    db.collection('teams').where('teamName', '==', req.body.teamName).get().then(teams => {
+        if (teams.empty) {
+            db.collection('teams').add({
+                'teamName': req.body.teamName,
+                'totalSteps': 0
+            }).then(() => {
+                res.status(200).send({ "message": "Team created" });
+            })
+        } else
+            throw ({ "code": "duplicate/team exists", "message": "A team with the selected name already exists, please select a unique name" });
+    }).catch(err => {
+        res.status(500).send(err);
+    })
+})
+
+app.put('/teams/add-user', async (req, res) => {
+    db.collection('teams').where('teamName', '==', req.body.teamName).get().then(teams => {
+        if (!teams.empty) {
+            teams.docs.forEach(team => {
+                let userRef = db.collection('users').doc(req.body.id);
+                let user;
+                userRef.get().then((u) => {
+                    if (u.exists) {
+                        user = u.data();
+                        user['team'] = team.id
+                    } else
+                        throw ({ "code": "auth/user doesnt exist", "message": "The users with the selected id either does not exist or is already in a team" });
+
+                    team.ref.collection('members').doc(user.uid).set(user);
+                    let newTotalSteps = team.data().totalSteps + user.stepCount;
+
+                    team.ref.update({
+                        'totalSteps': newTotalSteps
+                    })
+
+                    userRef.delete();
+                    res.status(200).send({ "message": "User added to team" });
+                }).catch(err => {
+                    res.status(500).send(err);
+                })
+            })
+        } else
+            throw ({ "code": "auth/team doesnt exist", "message": "A team with the selected name already does not exist, please make sure the team name is correct" });
+    }).catch(err => {
+        res.status(500).send(err);
+    })
+})
+
+app.put('/teams/remove-user', async (req, res) => {
+    db.collectionGroup('members').where('uid', '==', req.body.id).get().then(users => {
+        if (users.empty)
+            throw ({ "code": "auth/user doesnt exist", "message": "The users with the selected id either does not exist or is already in a team" });
+        else {
+            users.docs.forEach(user => {
+                db.collection('teams').doc(user.data().team).get().then(team => {
+                    let newTotalSteps = team.data().totalSteps - user.data().stepCount
+                    db.collection('teams').doc(team.id).update({
+                        'totalSteps': newTotalSteps
+                    }).then(() => {
+                        let data = user.data()
+                        delete data.team
+                        db.collection('teams').doc(team.id).collection('members').doc(user.data().uid).delete();
+                        db.collection('users').doc(data.uid).set(data);
+                    })
+                })
+            })
+            res.status(200).send({ 'message': 'User removed' });
+        }
+    }).catch(err => {
+        res.status(500).send(err);
+    })
+})
+
+app.delete('/teams', async (req, res) => {
+    db.collection('teams').where('teamName', '==', req.query.teamName).get().then(teams => {
+        if (!teams.empty) {
+            teams.docs.forEach(team => {
+                team.ref.collection('members').get().then(async users => {
+                    let batch = db.batch();
+                    users.docs.forEach(user => {
+                        admin.auth().deleteUser(user.data().uid);
+                        batch.delete(user.ref);
+                    })
+
+                    batch.delete(team.ref);
+                    await batch.commit();
+                    res.status(200).send({ 'message': 'Team deleted' })
+                }).catch(err => {
+                    res.status(500).send(err);
+                })
+            })
+        } else
+            throw ({ "code": "auth/team doesnt exist", "message": "A team with the selected name already does not exist, please make sure the team name is correct" });
+    }).catch(err => {
+        res.status(500).send(err);
+    })
+})
+
+app.get('/teams', async (req, res) => {
+    let allTeams = [];
+
+    await db.collection('teams').get().then(async teams => {
+        var allTeamPromises = await teams.docs.map(async team => {
+            let teamData = team.data();
+            teamData['users'] = [];
+            var userPromise = await team.ref.collection('members').get().then(users => {
+                users.forEach(user => {
+                    teamData.users.push(user.data());
+                })
+            }).then(() => {
+                allTeams.push(teamData);
+                return allTeams;
+            })
+            await Promise.all(userPromise);
+            return allTeams;
+        })
+
+        await Promise.all(allTeamPromises);
+        res.status(200).send({ 'data': allTeams })
+    });
 })
 
 app.listen(3000, () => console.log('Express server running on port 3000'));
