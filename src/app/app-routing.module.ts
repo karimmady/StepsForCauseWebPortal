@@ -77,13 +77,8 @@ const routes: Routes = [
     component: UnauthorizedComponent
   },
   {
-<<<<<<< HEAD
     path: 'statistics',
     component: StatisticsPageComponent
-=======
-    path: 'countdown',
-    component: CountdownComponent
->>>>>>> 4ad04aa7a9f79fe2c905db73a590a1f2549d4427
   }
 ];
 
