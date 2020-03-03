@@ -4,10 +4,15 @@ import { FirebaseAdminService } from 'src/app/services/firebase-admin.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
-import { ThrowStmt } from '@angular/compiler';
+import { AngularFirestoreCollection, AngularFirestoreCollectionGroup, AngularFirestore } from 'angularfire2/firestore';
+import { Observable } from 'rxjs';
+import { FirebaseService } from 'src/app/services/firebase.service';
 
-class User {
-  constructor(public name, public email, public password, public stepCount, public photo, public isAdmin) { }
+export interface User {
+  name: string;
+  stepCount: number;
+  email: string;
+  team: string;
 }
 
 @Component({
@@ -23,10 +28,18 @@ export class UsersComponent implements OnInit {
   public dbref: AngularFireList<User>;
   loading = true;
   records: any
-  users: Array<firebase.User>;
+  users: any[];
+  teams: any;
+
+  userRef: AngularFirestoreCollection<User>;
+  usersCollect: Observable<User[]>;
+
+  teamMembersRef: AngularFirestoreCollectionGroup<User>;
+  teamMembersCollect: Observable<User[]>;
 
   selectedId = "";
-  selectedEmail = "";
+  selectedTeamToAddSteps = "";
+  indexToDelete: number;
 
   selectedEmailAddToTeam = "";
   selectedEmailRemoveFromTeam = "";
@@ -46,42 +59,52 @@ export class UsersComponent implements OnInit {
     ]),
   });
 
-  constructor(private db: AngularFireDatabase, private firebaseadmin: FirebaseAdminService,
-    private authService: AuthService, private router: Router) { }
+  constructor(
+    private firebase: FirebaseService,
+    private firebaseadmin: FirebaseAdminService,
+    private authService: AuthService,
+    private router: Router,
+    private afs: AngularFirestore
+  ) {
+    this.userRef = this.afs.collection<User>('users');
+    this.usersCollect = this.userRef.valueChanges();
 
-  ngOnInit() {
-    this.dbref = this.db.list('/users')
-    this.records = this.dbref.valueChanges();
-    this.records.subscribe(res => {
-      console.log(res)
-      this.users = res;
-      this.loading = false;
-    })
+    this.teamMembersRef = this.afs.collectionGroup<User>('members');
+    this.teamMembersCollect = this.teamMembersRef.valueChanges();
+  }
+
+  async ngOnInit() {
+    this.teams = await this.firebase.getTeams();
+    this.updateUsers();
   }
 
   logout() {
     this.authService.SignOut();
     this.router.navigate(['']);
   }
-  
-  async updateUsers() {
-    this.dbref = this.db.list('/users')
-    this.records = this.dbref.valueChanges();
-    this.records.subscribe(async res => {
-      console.log(res)
-      this.users = await res;
-      this.loading = false;
-    })
+
+  updateUsers() {
+    let users = [];
+    let teamMembers = [];
+    this.usersCollect.subscribe(async usersInCollection => {
+      this.teamMembersCollect.subscribe(async membersInCollection => {
+        teamMembers = membersInCollection;
+        users = usersInCollection;
+        this.users = teamMembers.concat(users);
+        this.loading = false;
+      });
+    }, err => {
+      console.log(err)
+    });
   }
 
   deleteUser() {
     this.loading = true;
-    this.firebaseadmin.deleteUser(this.selectedId).subscribe(async res => {
-      await this.updateUsers().then(() => {
-        this.handleOkDelete();
-        this.loading = false;
-        alert("User deleted")
-      })
+    this.firebaseadmin.deleteUser(this.selectedId).subscribe(res => {
+      this.handleOkDelete();
+      // this.users.splice(this.indexToDelete, 1);
+      this.loading = false;
+      alert("User deleted")
     }, err => {
       this.handleCancelDelete();
       this.loading = false;
@@ -91,7 +114,7 @@ export class UsersComponent implements OnInit {
 
   addSteps() {
     this.loading = true;
-    this.firebaseadmin.addStepsToUser(this.selectedEmail, this.addStepsForm.value.steps).subscribe(res => {
+    this.firebaseadmin.addStepsToUser(this.selectedId, this.selectedTeamToAddSteps, this.addStepsForm.value.steps).subscribe(res => {
       this.handleOkSteps();
       this.loading = false;
       alert("Steps added");
@@ -102,13 +125,12 @@ export class UsersComponent implements OnInit {
     })
   }
 
-  changeAdminStatus(email, isAdmin) {
+  changeAdminStatus(id, team, isAdmin) {
     this.loading = true;
-    this.firebaseadmin.changeAdminStatus(email, isAdmin).subscribe(async res => {
-      await this.updateUsers().then(() => {
-        this.loading = false;
-        alert("User updated");
-      })
+    this.firebaseadmin.changeAdminStatus(id, team, isAdmin).subscribe(res => {
+      alert("User updated");
+      this.loading = false;
+      console.log(this.users)
     }, err => {
       this.loading = false;
       alert(err.error.code + "\n" + err.error.message)
@@ -141,8 +163,9 @@ export class UsersComponent implements OnInit {
     })
   }
 
-  showModalDelete(id): void {
+  showModalDelete(id, index): void {
     this.selectedId = id;
+    this.indexToDelete = index;
     this.isVisibleDelete = true;
   }
 
@@ -155,8 +178,9 @@ export class UsersComponent implements OnInit {
     this.isVisibleDelete = false;
   }
 
-  showModalSteps(email): void {
-    this.selectedEmail = email;
+  showModalSteps(id, team): void {
+    this.selectedId = id;
+    this.selectedTeamToAddSteps = team;
     this.isVisibleSteps = true;
   }
 
@@ -195,4 +219,10 @@ export class UsersComponent implements OnInit {
   handleCancleTeamRemove(): void {
     this.isVisibleTeamRemove = false;
   }
+
+  // async getTeam(teamID) {
+  //   let teamName = await this.firebase.getTeam(teamID);
+  //   this.teams[teamID] = teamName;
+  //   console.log(teamName)
+  // }
 }

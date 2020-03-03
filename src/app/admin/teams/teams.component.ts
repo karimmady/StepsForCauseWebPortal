@@ -37,13 +37,13 @@ export class TeamsComponent implements OnInit {
   }
 
   addStepsToUser(email, steps) {
-    this.firebaseadmin.addStepsToUser(email, steps).subscribe(async res => {
-      await this.getTeams();
-      this.handleOkMembers();
-      alert("Steps added")
-    }, err => {
-      alert(err.error.code + "\n" + err.error.message)
-    })
+    // this.firebaseadmin.addStepsToUser(email, steps).subscribe(async res => {
+    //   await this.getTeams();
+    //   this.handleOkMembers();
+    //   alert("Steps added")
+    // }, err => {
+    //   alert(err.error.code + "\n" + err.error.message)
+    // })
   }
 
   removeUserFromTeam(email, teamName) {

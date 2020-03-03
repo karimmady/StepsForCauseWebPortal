@@ -40,9 +40,10 @@ export class FirebaseAdminService {
     return this.http.post("http://localhost:3000/users", body);
   }
 
-  addStepsToUser(email: string, addedStepCount: number) {
+  addStepsToUser(id, team, addedStepCount: number) {
     var body = {
-      "email": email,
+      "id": id,
+      "team": team,
       "addedStepCount": addedStepCount
     }
     return this.http.put("http://localhost:3000/users", body);
@@ -87,9 +88,10 @@ export class FirebaseAdminService {
     return this.http.delete(`http://localhost:3000/teams?teamName=${teamName}`);
   }
 
-  changeAdminStatus(email: string, isAdmin: boolean) {
+  changeAdminStatus(id, team, isAdmin: boolean) {
     var body = {
-      "email": email,
+      "id": id,
+      "team": team,
       "isAdmin": isAdmin
     }
     return this.http.put("http://localhost:3000/users/change-isAdmin", body);

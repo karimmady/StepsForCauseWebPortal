@@ -36,21 +36,15 @@ export class AdminLoginComponent implements OnInit {
   }
 
   async login() {
-    await this._firebase.SignIn(this.validateForm.value.email, this.validateForm.value.password).then(res => {
-      this._firebase.setUser(res);
+    await this._firebase.SignIn(this.validateForm.value.email, this.validateForm.value.password).then(async res => {
       try {
-        this.dbref.orderByChild("email").equalTo(res.email).once("value", async (snapshot) => {
-          if (snapshot.exists()) {
-            const uid = Object.keys(snapshot.val())[0];
-            localStorage.setItem('isAdmin', snapshot.val()[uid].isAdmin);
-            if (snapshot.val()[uid].isAdmin) {
-              this.router.navigate(['/admin/dashboard']);
-              return;
-            } else {
-              alert("This user is not an admin")
-            }
-          }
-        });
+        let user = await this._firebase.getDbUser();
+        localStorage.setItem('isAdmin', user.isAdmin);
+
+        if (user.isAdmin)
+          this.router.navigate(['/admin/dashboard']);
+        else
+          alert('This user is not an admin');
       } catch (err) {
         console.log("Current user has not been retreived yet which led to the following error")
         console.log(err)

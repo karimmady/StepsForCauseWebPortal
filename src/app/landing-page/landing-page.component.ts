@@ -60,7 +60,7 @@ export class LandingPageComponent implements OnInit {
       this.exists = await this.firebaseService.checkUserExists(this.user.email);
       if (!this.exists)
         await this.firebaseService.AddUser(this.user)
-      this.firebaseService.setUser(this.user)
+      // this.firebaseService.setUser(this.user)
       this.router.navigate(['/user'])
     }
     else
@@ -91,7 +91,7 @@ export class LandingPageComponent implements OnInit {
       this.exists = await this.firebaseService.checkUserExists(this.user.email);
       if (!this.exists)
         await this.firebaseService.AddUser(this.user)
-      this.firebaseService.setUser(this.user)
+      // this.firebaseService.setUser(this.user)
       this.router.navigate(['/user'])
     }
     else

@@ -66,37 +66,35 @@ app.post('/users', async (req, res) => {
 app.put('/users', async (req, res) => {
     db.collection('users').doc(req.body.id).get().then(user => {
         if (!user.exists) {
-            db.collection('teams').where('teamName', '==', req.body.teamName).get().then(teams => {
-                teams.forEach(team => {
-                    db.collection('teams').doc(team.id).collection('members').doc(req.body.id).get().then((user) => {
-                        if (!user.exists)
-                            throw ({ "code": "auth/id not found", "message": "The id does not exist or has been deleted" });
+            db.collection('teams').doc(req.body.team).get().then(team => {
+                team.ref.collection('members').doc(req.body.id).get().then(user => {
+                    if (!user.exists)
+                        throw ({ "code": "auth/id not found", "message": "The id does not exist or has been deleted" });
+                    else {
+                        let data = user.data();
+                        let newSteps = +data.stepCount + +req.body.addedStepCount;
+                        if (isNaN(newSteps))
+                            throw ({ "code": "type/invalid step count", "message": "The step count entered is of an invalid data type" });
                         else {
-                            let data = user.data();
-                            let newSteps = data.stepCount + req.body.addedStepCount
-                            if (isNaN(newSteps))
-                                throw ({ "code": "type/invalid step count", "message": "The step count entered is of an invalid data type" });
-                            else {
-                                user.ref.update({
-                                    'stepCount': newSteps
-                                })
-                                let data = team.data();
-                                let newStepsTeam = data.totalSteps + req.body.addedStepCount
+                            user.ref.update({
+                                'stepCount': newSteps
+                            });
+                            let data = team.data();
+                            let newStepsTeam = +data.totalSteps + +req.body.addedStepCount
 
-                                team.ref.update({
-                                    'totalSteps': newStepsTeam
-                                })
-                                res.status(200).send({ "message": "Steps updated" });
-                            }
+                            team.ref.update({
+                                'totalSteps': newStepsTeam
+                            })
+                            res.status(200).send({ "message": "Steps updated" });
                         }
-                    }).catch(err => {
-                        res.status(500).send(err);
-                    })
+                    }
+                }).catch(err => {
+                    res.status(500).send(err);
                 })
             })
         } else {
             let data = user.data();
-            let newSteps = data.stepCount + req.body.addedStepCount
+            let newSteps = +data.stepCount + +req.body.addedStepCount
             if (isNaN(newSteps))
                 throw ({ "code": "type/invalid step count", "message": "The step count entered is of an invalid data type" });
             else {
@@ -114,24 +112,16 @@ app.put('/users', async (req, res) => {
 app.put('/users/change-isAdmin', async (req, res) => {
     db.collection('users').doc(req.body.id).get().then(user => {
         if (!user.exists) {
-            if (!req.body.teamName)
-                throw ({ "code": "auth/id not found", "message": "The id does not exist or has been deleted" });
-            db.collection('teams').where('teamName', '==', req.body.teamName).get().then(teams => {
-                teams.forEach(team => {
-                    db.collection('teams').doc(team.id).collection('members').doc(req.body.id).get().then((user) => {
-                        if (!user.exists)
-                            throw ({ "code": "auth/id not found", "message": "The id does not exist or has been deleted" });
-                        else {
-                            user.ref.update({
-                                'isAdmin': req.body.isAdmin
-                            })
-                            res.status(200).send({ "message": "User updated" });
-                        }
-                    }).catch(err => {
-                        res.status(500).send(err);
-                    });
-                })
-            })
+            db.collection('teams').doc(req.body.team).collection('members').doc(req.body.id).get().then(user => {
+                if (!user.exists)
+                    throw ({ "code": "auth/id not found", "message": "The id does not exist or has been deleted" });
+                else {
+                    user.ref.update({
+                        'isAdmin': req.body.isAdmin
+                    })
+                    res.status(200).send({ "message": "User updated" });
+                }
+            });
         } else {
             user.ref.update({
                 'isAdmin': req.body.isAdmin

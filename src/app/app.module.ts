@@ -33,6 +33,7 @@ import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import * as firebase from 'firebase';
 import { TeamsComponent } from './admin/teams/teams.component';
 import { CountdownComponent } from './countdown/countdown.component';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
 
 registerLocaleData(en);
 
@@ -66,6 +67,7 @@ registerLocaleData(en);
     CommonModule,
     HttpModule,
     AngularFireModule.initializeApp(environment.firebase, 'steps-for-cause'),
+    AngularFirestoreModule,
     AngularFireDatabaseModule,
   ],
   providers: [AngularFireAuth, , AngularFireDatabaseModule, AngularFireModule, AuthService, AuthGuard, { provide: NZ_I18N, useValue: en_US }],

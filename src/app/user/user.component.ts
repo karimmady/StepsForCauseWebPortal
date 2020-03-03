@@ -10,7 +10,7 @@ import { Observable, Observer } from 'rxjs';
 })
 export class UserComponent implements OnInit {
 
-  user: firebase.User;
+  user: any;
   addSteps = false;
   steps: number;
   loading: boolean;
@@ -20,24 +20,18 @@ export class UserComponent implements OnInit {
   async ngOnInit() {
     this.loading = true;
     try {
-      var fb_user = await this.firebase.getUser();
+      this.user = await this.firebase.getDbUser();
 
-      this.db.list('users').valueChanges().subscribe(users => {
-        users.map(async (u: firebase.User) => {
-          if (u.uid === fb_user.uid) {
-            this.user = u;
-            this.loading = false;
-            if (this.user["photo"] == undefined && this.user.photoURL) {
-              await this.getBase64ImageFromURL(this.user.photoURL).subscribe(async base64data => {
-                this.user["photo"] = ('data:image/jpg;base64,' + base64data);
-              });
-            }
-            console.log(this.user)
-          }
+      if (this.user.photo == undefined && this.user.photoURL) {
+        await this.getBase64ImageFromURL(this.user.photoURL).subscribe(async base64data => {
+          this.user.photo = ('data:image/jpg;base64,' + base64data);
+          this.loading = false;
         })
-      })
-    }
-    catch (err) {
+      } else {
+        this.loading = false;
+      }
+
+    } catch (err) {
       console.log("Current user has not been retreived yet which led to the following error")
       console.log(err)
     }
@@ -49,22 +43,8 @@ export class UserComponent implements OnInit {
 
   async submit() {
     this.loading = true;
-    await this.firebase.updateStepCount(this.user, this.user["stepCount"], this.steps).then(res => {
-      this.db.list('users').valueChanges().subscribe(users => {
-        users.map(async (u: firebase.User) => {
-          if (u.uid === this.user.uid) {
-            this.user = u;
-            if (this.user["photo"] == undefined && this.user.photoURL) {
-              await this.getBase64ImageFromURL(this.user.photoURL).subscribe(async base64data => {
-                this.user["photo"] = ('data:image/jpg;base64,' + base64data);
-              });
-            }
-            this.loading = false;
-            console.log(this.user)
-          }
-        })
-      })
-    });
+    this.user = await this.firebase.updateStepCount(this.steps);
+    this.loading = false;
   }
 
   getBase64ImageFromURL(url: string) {

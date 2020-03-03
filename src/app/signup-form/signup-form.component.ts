@@ -21,10 +21,7 @@ export class SignupFormComponent implements OnInit {
   loading = false;
   submittedForm = false;
   validCompanyInfo = false;
-  companyName: any;
-  totalSteps: any;
-  public users: AngularFireList<User>;
-  com: any;
+  
 
   signupForm = new FormGroup({
     firstName: new FormControl('', [
@@ -45,10 +42,7 @@ export class SignupFormComponent implements OnInit {
     ])
   });
 
-  constructor(private router: Router, private firebase: FirebaseService, db: AngularFireDatabase) {
-    this.users = db.list('/users')
-    this.com = this.users.valueChanges();
-    this.com.subscribe(res => console.log(res))
+  constructor(private router: Router, private firebase: FirebaseService) {
   }
 
   checkFormsValidity(): void {

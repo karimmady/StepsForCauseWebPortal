@@ -31,7 +31,6 @@ export class LoginComponent implements OnInit {
   async login() {
     await this.firebase.SignIn(this.validateForm.value.userName, this.validateForm.value.password).then(res => {
       if (res.emailVerified) {
-        this.firebase.setUser(res);
         this.router.navigate(['/user'])
       } else {
         alert ("It seems like you have not yet verified your email")
