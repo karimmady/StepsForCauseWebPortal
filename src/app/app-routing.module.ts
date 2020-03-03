@@ -79,6 +79,10 @@ const routes: Routes = [
   {
     path: 'statistics',
     component: StatisticsPageComponent
+  },
+  {
+    path: 'countdown',
+    component: CountdownComponent
   }
 ];
 
