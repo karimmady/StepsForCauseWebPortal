@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 import { AngularFirestoreCollection, AngularFirestoreCollectionGroup, AngularFirestore } from 'angularfire2/firestore';
 import { Observable } from 'rxjs';
 import { FirebaseService } from 'src/app/services/firebase.service';
+import { map } from 'rxjs/operators';
+import { combineLatest } from 'rxjs'
 
 export interface User {
   name: string;
@@ -28,7 +30,7 @@ export class UsersComponent implements OnInit {
   public dbref: AngularFireList<User>;
   loading = true;
   records: any
-  users: any[];
+  users = [];
   teams: any;
 
   userRef: AngularFirestoreCollection<User>;
@@ -36,6 +38,12 @@ export class UsersComponent implements OnInit {
 
   teamMembersRef: AngularFirestoreCollectionGroup<User>;
   teamMembersCollect: Observable<User[]>;
+
+  userCol: AngularFirestoreCollection<any>;
+  userColVals: any;
+
+  teamCol: AngularFirestoreCollectionGroup<any>;
+  teamColVals: any;
 
   selectedId = "";
   selectedTeamToAddSteps = "";
@@ -75,7 +83,8 @@ export class UsersComponent implements OnInit {
 
   async ngOnInit() {
     this.teams = await this.firebase.getTeams();
-    this.updateUsers();
+    await this.updateUsers();
+    this.loading = false;
   }
 
   logout() {
@@ -83,19 +92,27 @@ export class UsersComponent implements OnInit {
     this.router.navigate(['']);
   }
 
-  updateUsers() {
-    let users = [];
-    let teamMembers = [];
-    this.usersCollect.subscribe(async usersInCollection => {
-      this.teamMembersCollect.subscribe(async membersInCollection => {
-        teamMembers = membersInCollection;
-        users = usersInCollection;
-        this.users = teamMembers.concat(users);
-        this.loading = false;
-      });
-    }, err => {
-      console.log(err)
-    });
+  async updateUsers() {
+    this.userCol = this.afs.collection<any>('users');
+    this.userColVals = this.userCol.snapshotChanges().pipe(
+      map(actions => actions.map(a => {    // THIS LINE IS SLIGHTLY DIFFERENT
+        const data = a.payload.doc.data();
+        return { ...data };
+      }))
+    );
+
+    this.teamCol = this.afs.collectionGroup<any>('members');
+    this.teamColVals = this.teamCol.snapshotChanges().pipe(
+      map(actions => actions.map(a => {    // THIS LINE IS SLIGHTLY DIFFERENT
+        const data = a.payload.doc.data();
+        return { ...data };
+      }))
+    );
+    combineLatest(this.userColVals, this.teamColVals).pipe(
+      map(([x, y]) => x.concat(y) as Array<any>)
+    ).subscribe(users => {
+      this.users = users as [];
+    })
   }
 
   deleteUser() {
