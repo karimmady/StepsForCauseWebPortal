@@ -130,5 +130,8 @@
       }
     }
   },
-  "defaultProject": "Dellathon-UI"
+  "defaultProject": "Dellathon-UI",
+  "cli": {
+    "analytics": "40edefa6-6e72-4241-aa79-e8866ad13c7e"
+  }
 }
