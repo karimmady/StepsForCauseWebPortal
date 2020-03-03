@@ -29,6 +29,10 @@ export class FirebaseAdminService {
     return this.http.post("http://localhost:3000/admins", body);
   }
 
+  getTable() {
+    return this.http.get("http://localhost:3000/table");
+  }
+
   createUser(email: string, password: string, firstName: string, lastName: string, stepCount: number) {
     var body = {
       "email": email,

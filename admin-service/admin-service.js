@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Provide authentication credentials to your application code by setting the environment variable GOOGLE_APPLICATION_CREDENTIALS
+// in order for bigquery to work.** export GOOGLE_APPLICATION_CREDENTIALS="/home/user/Downloads/[FILE_NAME].json" **
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const express = require('express');
 const cors = require('cors');
 const helmet = require("helmet");
@@ -6,6 +12,8 @@ const app = express();
 const admin = require("firebase-admin");
 const serviceAccount = require("./steps-for-cause-firebase-adminsdk-hnxxk-ef03407863.json");
 const utils = require("./utils");
+const { BigQuery } = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -259,6 +267,21 @@ app.delete('/teams', async (req, res) => {
         }
     });
 })
+
+app.get('/table', async (req, res) => {
+    var data
+    try {
+        await bigquery.query('SELECT * FROM `steps-for-cause.analytics_221430045.country`').then(
+            response => data = response
+        )
+        res.status(200).send(data)
+        return
+    } catch (error) {
+        res.sendStatus(500)
+        return
+    }
+})
+
 
 app.get('/teams', async (req, res) => {
     const teamdb = admin.database().ref('/teams');
