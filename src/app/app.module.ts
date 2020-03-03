@@ -32,6 +32,7 @@ import { AuthGuard } from './auth.guard';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import * as firebase from 'firebase';
 import { TeamsComponent } from './admin/teams/teams.component';
+import { StatisticsPageComponent } from './statistics-page/statistics-page.component';
 import { CountdownComponent } from './countdown/countdown.component';
 
 registerLocaleData(en);
@@ -53,6 +54,7 @@ registerLocaleData(en);
     CreateAdminComponent,
     UnauthorizedComponent,
     TeamsComponent,
+    StatisticsPageComponent,
     CountdownComponent,
   ],
   imports: [
