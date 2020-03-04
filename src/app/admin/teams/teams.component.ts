@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FirebaseAdminService } from 'src/app/services/firebase-admin.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
+import { FirebaseService } from 'src/app/services/firebase.service';
+import { _ } from 'underscore';
 
 @Component({
   selector: 'app-teams',
@@ -11,6 +13,7 @@ import { Router } from '@angular/router';
 export class TeamsComponent implements OnInit {
   loading = true;
   teams: any;
+  teamIDs = {};
 
   selectedTeam = "";
   selectedTeamUsers = [];
@@ -19,10 +22,15 @@ export class TeamsComponent implements OnInit {
   isVisibleDelete = false;
   isVisibleMembers = false;
 
-  constructor(private firebaseadmin: FirebaseAdminService, private authService: AuthService,
-    private router: Router) { }
+  constructor(
+    private firebaseadmin: FirebaseAdminService,
+    private authService: AuthService,
+    private router: Router,
+    private firebase: FirebaseService
+  ) { }
 
   async ngOnInit() {
+    this.teamIDs = await this.firebase.getTeams();
     await this.getTeams();
   }
 
@@ -36,31 +44,32 @@ export class TeamsComponent implements OnInit {
     })
   }
 
-  addStepsToUser(email, steps) {
-    // this.firebaseadmin.addStepsToUser(email, steps).subscribe(async res => {
-    //   await this.getTeams();
-    //   this.handleOkMembers();
-    //   alert("Steps added")
-    // }, err => {
-    //   alert(err.error.code + "\n" + err.error.message)
-    // })
+  addStepsToUser(id, team, steps) {
+    this.firebaseadmin.addStepsToUser(id, team, steps).subscribe(async res => {
+      this.handleOkMembers();
+      alert("Steps added")
+      await this.getTeams()
+    }, err => {
+      alert(err.error.code + "\n" + err.error.message)
+    })
   }
 
-  removeUserFromTeam(email, teamName) {
-    this.firebaseadmin.removeUserFromTeam(email, teamName).subscribe(async res => {
-      await this.getTeams();
+  removeUserFromTeam(id, team) {
+    this.firebaseadmin.removeUserFromTeam(id, team).subscribe(async res => {
       this.handleOkMembers();
       alert("User removed");
+      await this.getTeams();
     }, err => {
       alert(err.error.code + "\n" + err.error.message)
     })
   }
 
   deleteTeam() {
-    this.firebaseadmin.deleteTeam(this.selectedTeam).subscribe(async res => {
-      this.getTeams();
+    let teamID = (_.invert(this.teamIDs))[this.selectedTeam];
+    this.firebaseadmin.deleteTeam(teamID).subscribe(async res => {
       this.handleOkDelete();
       alert("Team deleted");
+      await this.getTeams();
     }, err => {
       alert(err.error.code + "\n" + err.error.message)
     })
@@ -71,8 +80,8 @@ export class TeamsComponent implements OnInit {
     this.router.navigate(['']);
   }
 
-  showModalDelete(teamName): void {
-    this.selectedTeam = teamName;
+  showModalDelete(team): void {
+    this.selectedTeam = team;
     this.isVisibleDelete = true;
   }
 

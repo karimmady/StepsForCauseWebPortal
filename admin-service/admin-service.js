@@ -184,56 +184,61 @@ app.post('/teams', async (req, res) => {
 })
 
 app.put('/teams/add-user', async (req, res) => {
-    db.collection('teams').where('teamName', '==', req.body.teamName).get().then(teams => {
-        if (!teams.empty) {
-            teams.docs.forEach(team => {
-                let userRef = db.collection('users').doc(req.body.id);
-                let user;
-                userRef.get().then((u) => {
-                    if (u.exists) {
-                        user = u.data();
-                        user['team'] = team.id
-                    } else
-                        throw ({ "code": "auth/user doesnt exist", "message": "The users with the selected id either does not exist or is already in a team" });
+    try {
+        if (!req.body.team)
+            throw ({ "code": "auth/team doesnt exist", "message": "A team with the selected name does not exist, please make sure the team name is correct" });
+        else {
+            db.collection('teams').doc(req.body.team).get().then(team => {
+                if (team.exists) {
+                    let userRef = db.collection('users').doc(req.body.id);
+                    let user;
+                    userRef.get().then(u => {
+                        if (u.exists) {
+                            user = u.data();
+                            user['team'] = team.id
+                        } else
+                            throw ({ "code": "auth/user doesnt exist", "message": "The users with the selected id either does not exist or is already in a team" });
 
-                    team.ref.collection('members').doc(user.uid).set(user);
-                    let newTotalSteps = team.data().totalSteps + user.stepCount;
+                        team.ref.collection('members').doc(user.uid).set(user);
+                        let newTotalSteps = +team.data().totalSteps + +user.stepCount;
+                        team.ref.update({
+                            'totalSteps': newTotalSteps
+                        });
 
-                    team.ref.update({
-                        'totalSteps': newTotalSteps
+                        userRef.delete();
+                        res.status(200).send({ "message": "User added to team" });
+                    }).catch(err => {
+                        res.status(500).send(err);
                     })
-
-                    userRef.delete();
-                    res.status(200).send({ "message": "User added to team" });
-                }).catch(err => {
-                    res.status(500).send(err);
-                })
+                }
+                else
+                    throw ({ "code": "auth/team doesnt exist", "message": "A team with the selected name does not exist, please make sure the team name is correct" });
+            }).catch(err => {
+                res.status(500).send(err);
             })
-        } else
-            throw ({ "code": "auth/team doesnt exist", "message": "A team with the selected name already does not exist, please make sure the team name is correct" });
-    }).catch(err => {
+        }
+    } catch (err) {
         res.status(500).send(err);
-    })
+    }
 })
 
 app.put('/teams/remove-user', async (req, res) => {
-    db.collectionGroup('members').where('uid', '==', req.body.id).get().then(users => {
-        if (users.empty)
+    db.collection('teams').doc(req.body.team).collection('members').doc(req.body.id).get().then(user => {
+        if (!user.exists)
             throw ({ "code": "auth/user doesnt exist", "message": "The users with the selected id either does not exist or is already in a team" });
         else {
-            users.docs.forEach(user => {
-                db.collection('teams').doc(user.data().team).get().then(team => {
-                    let newTotalSteps = team.data().totalSteps - user.data().stepCount
-                    db.collection('teams').doc(team.id).update({
-                        'totalSteps': newTotalSteps
-                    }).then(() => {
-                        let data = user.data()
-                        delete data.team
-                        db.collection('teams').doc(team.id).collection('members').doc(user.data().uid).delete();
-                        db.collection('users').doc(data.uid).set(data);
-                    })
+            let userData = user.data();
+            db.collection('teams').doc(req.body.team).get().then(team => {
+                let teamData = team.data();
+                let newTotalSteps = teamData.totalSteps - userData.stepCount;
+                db.collection('teams').doc(req.body.team).update({
+                    'totalSteps': newTotalSteps
+                }).then(() => {
+                    delete userData.team;
+                    db.collection('teams').doc(req.body.team).collection('members').doc(req.body.id).delete();
+                    db.collection('users').doc(req.body.id).set(userData);
                 })
-            })
+            });
             res.status(200).send({ 'message': 'User removed' });
         }
     }).catch(err => {
@@ -242,22 +247,20 @@ app.put('/teams/remove-user', async (req, res) => {
 })
 
 app.delete('/teams', async (req, res) => {
-    db.collection('teams').where('teamName', '==', req.query.teamName).get().then(teams => {
-        if (!teams.empty) {
-            teams.docs.forEach(team => {
-                team.ref.collection('members').get().then(async users => {
-                    let batch = db.batch();
-                    users.docs.forEach(user => {
-                        admin.auth().deleteUser(user.data().uid);
-                        batch.delete(user.ref);
-                    })
-
-                    batch.delete(team.ref);
-                    await batch.commit();
-                    res.status(200).send({ 'message': 'Team deleted' })
-                }).catch(err => {
-                    res.status(500).send(err);
+    db.collection('teams').doc(req.query.team).get().then(team => {
+        if (team.exists) {
+            team.ref.collection('members').get().then(async users => {
+                let batch = db.batch();
+                users.docs.forEach(user => {
+                    admin.auth().deleteUser(user.data().uid);
+                    batch.delete(user.ref);
                 })
+
+                batch.delete(team.ref);
+                await batch.commit();
+                res.status(200).send({ 'message': 'Team deleted' })
+            }).catch(err => {
+                res.status(500).send(err);
             })
         } else
             throw ({ "code": "auth/team doesnt exist", "message": "A team with the selected name already does not exist, please make sure the team name is correct" });

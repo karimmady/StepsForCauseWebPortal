@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { map } from 'rxjs/operators';
 import { combineLatest } from 'rxjs'
+import { _ } from 'underscore';
 
 export interface User {
   name: string;
@@ -27,17 +28,9 @@ export class UsersComponent implements OnInit {
   isVisibleSteps = false;
   isVisibleTeamAdd = false;
   isVisibleTeamRemove = false;
-  public dbref: AngularFireList<User>;
   loading = true;
-  records: any
   users = [];
   teams: any;
-
-  userRef: AngularFirestoreCollection<User>;
-  usersCollect: Observable<User[]>;
-
-  teamMembersRef: AngularFirestoreCollectionGroup<User>;
-  teamMembersCollect: Observable<User[]>;
 
   userCol: AngularFirestoreCollection<any>;
   userColVals: any;
@@ -47,11 +40,8 @@ export class UsersComponent implements OnInit {
 
   selectedId = "";
   selectedTeamToAddSteps = "";
-  indexToDelete: number;
 
-  selectedEmailAddToTeam = "";
-  selectedEmailRemoveFromTeam = "";
-  selectedTeamNameRemove = "";
+  selectedTeamIDRemove = "";
 
   addStepsForm = new FormGroup({
     steps: new FormControl('', [
@@ -73,13 +63,7 @@ export class UsersComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private afs: AngularFirestore
-  ) {
-    this.userRef = this.afs.collection<User>('users');
-    this.usersCollect = this.userRef.valueChanges();
-
-    this.teamMembersRef = this.afs.collectionGroup<User>('members');
-    this.teamMembersCollect = this.teamMembersRef.valueChanges();
-  }
+  ) { }
 
   async ngOnInit() {
     this.teams = await this.firebase.getTeams();
@@ -92,22 +76,30 @@ export class UsersComponent implements OnInit {
     this.router.navigate(['']);
   }
 
+  /** This function is automatically called because of the subscription */
   async updateUsers() {
+    // Define what collection userCol points to and let userColVals contain the observable which will eventually
+    // contain the collection data
     this.userCol = this.afs.collection<any>('users');
     this.userColVals = this.userCol.snapshotChanges().pipe(
-      map(actions => actions.map(a => {    // THIS LINE IS SLIGHTLY DIFFERENT
+      map(actions => actions.map(a => {
         const data = a.payload.doc.data();
         return { ...data };
       }))
     );
 
+    // Define what collectionGrou teamCol points to and let teamColVals contain the observable which will eventually
+    // contain the collectionGroup data
     this.teamCol = this.afs.collectionGroup<any>('members');
     this.teamColVals = this.teamCol.snapshotChanges().pipe(
-      map(actions => actions.map(a => {    // THIS LINE IS SLIGHTLY DIFFERENT
+      map(actions => actions.map(a => {
         const data = a.payload.doc.data();
         return { ...data };
       }))
     );
+
+    // Combine the userColVals and teamColVals observables together and store their lates values as a single array
+    // in this.users
     combineLatest(this.userColVals, this.teamColVals).pipe(
       map(([x, y]) => x.concat(y) as Array<any>)
     ).subscribe(users => {
@@ -119,7 +111,6 @@ export class UsersComponent implements OnInit {
     this.loading = true;
     this.firebaseadmin.deleteUser(this.selectedId).subscribe(res => {
       this.handleOkDelete();
-      // this.users.splice(this.indexToDelete, 1);
       this.loading = false;
       alert("User deleted")
     }, err => {
@@ -147,7 +138,6 @@ export class UsersComponent implements OnInit {
     this.firebaseadmin.changeAdminStatus(id, team, isAdmin).subscribe(res => {
       alert("User updated");
       this.loading = false;
-      console.log(this.users)
     }, err => {
       this.loading = false;
       alert(err.error.code + "\n" + err.error.message)
@@ -156,7 +146,8 @@ export class UsersComponent implements OnInit {
 
   addUserToTeam() {
     this.loading = true;
-    this.firebaseadmin.addUserToTeam(this.selectedEmailAddToTeam, this.addToTeamForm.value.teamName).subscribe(res => {
+    let teamID = (_.invert(this.teams))[this.addToTeamForm.value.teamName];
+    this.firebaseadmin.addUserToTeam(this.selectedId, teamID).subscribe(res => {
       this.handleOkTeamAdd();
       this.loading = false;
       alert("User added to team");
@@ -169,7 +160,7 @@ export class UsersComponent implements OnInit {
 
   removeUserFromTeam() {
     this.loading = true;
-    this.firebaseadmin.removeUserFromTeam(this.selectedEmailRemoveFromTeam, this.selectedTeamNameRemove).subscribe(res => {
+    this.firebaseadmin.removeUserFromTeam(this.selectedId, this.selectedTeamIDRemove).subscribe(res => {
       this.handleOkTeamRemove();
       this.loading = false;
       alert("User deleted from team");
@@ -180,9 +171,8 @@ export class UsersComponent implements OnInit {
     })
   }
 
-  showModalDelete(id, index): void {
+  showModalDelete(id): void {
     this.selectedId = id;
-    this.indexToDelete = index;
     this.isVisibleDelete = true;
   }
 
@@ -191,7 +181,6 @@ export class UsersComponent implements OnInit {
   }
 
   handleCancelDelete(): void {
-    console.log('Button cancel clicked!');
     this.isVisibleDelete = false;
   }
 
@@ -206,12 +195,11 @@ export class UsersComponent implements OnInit {
   }
 
   handleCancelSteps(): void {
-    console.log('Button cancel clicked!');
     this.isVisibleSteps = false;
   }
 
-  showModalTeamAdd(email): void {
-    this.selectedEmailAddToTeam = email;
+  showModalTeamAdd(id): void {
+    this.selectedId = id;
     this.isVisibleTeamAdd = true;
   }
 
@@ -223,9 +211,9 @@ export class UsersComponent implements OnInit {
     this.isVisibleTeamAdd = false;
   }
 
-  showModalTeamRemove(email, teamName): void {
-    this.selectedEmailRemoveFromTeam = email;
-    this.selectedTeamNameRemove = teamName;
+  showModalTeamRemove(id, team): void {
+    this.selectedId = id;
+    this.selectedTeamIDRemove = team;
     this.isVisibleTeamRemove = true;
   }
 
@@ -236,10 +224,4 @@ export class UsersComponent implements OnInit {
   handleCancleTeamRemove(): void {
     this.isVisibleTeamRemove = false;
   }
-
-  // async getTeam(teamID) {
-  //   let teamName = await this.firebase.getTeam(teamID);
-  //   this.teams[teamID] = teamName;
-  //   console.log(teamName)
-  // }
 }

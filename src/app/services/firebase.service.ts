@@ -72,6 +72,7 @@ export class FirebaseService {
       .signOut();
   }
 
+  // Function to update the stepCount of a user object in the db whether in users collection or members collection
   async updateStepCount(addedStepCount) {
     if (this.dbUser.team) {
       await this._firestore.collection('teams').doc(this.dbUser.team).collection('members').doc(this.dbUser.uid).update({
@@ -100,11 +101,13 @@ export class FirebaseService {
     this.signUp.next(flag)
   }
 
+  // Get the current firebase-auth-service user
   getCurrentUser() {
     this.user = this.angularFireAuth.auth.currentUser
     return this.user;
   }
 
+  // Get the current user object in firestore whether in users or members collection
   async getDbUser() {
     var u = this.getCurrentUser();
     this.dbUser = (await this._firestore.collection('users').doc(u.uid).get().toPromise()).data()
@@ -133,6 +136,8 @@ export class FirebaseService {
     return exists
   }
 
+  // We perform all queries by id but the admin would not know the id of the user, therefore we retrieve the user
+  // data by email whether in users or members collection
   async getUserByEmail(email) {
     var user;
     (await this._firestore.collection('users', ref =>
@@ -151,6 +156,7 @@ export class FirebaseService {
     return user;
   }
 
+  // Get all teams so we can map the team id to a team name in the users table
   async getTeams() {
     let teams = {};
 
@@ -160,11 +166,5 @@ export class FirebaseService {
     })
 
     return teams;
-  }
-
-  test() {
-    this._firestore.collection('users').valueChanges().subscribe(user => {
-      console.log(user)
-    })
   }
 }
