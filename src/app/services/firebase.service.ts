@@ -56,14 +56,14 @@ export class FirebaseService {
     return user;
   }
 
-  AddUser(userInfo) {
-    this.dbref.child(userInfo.uid).set({
+  async addUser(userInfo) {
+    await this._firestore.collection('users').doc(userInfo.uid).set({
       'uid': userInfo.uid,
       'email': userInfo.email,
       'stepCount': 0,
       'name': userInfo.displayName,
       'photoURL': userInfo.photoURL
-    })
+    });
   }
 
   SignOut() {
@@ -125,15 +125,11 @@ export class FirebaseService {
 
   async checkUserExists(email) {
     var exists = false;
-    await this.dbref.once('value', async function (snapshot) {
-      await snapshot.forEach(function (childSnapshot) {
-        if (email == childSnapshot.val().email) {
-          exists = true;
-        }
-      })
-      console.log(exists)
-    });
-    return exists
+    let user = await this.getUserByEmail(email);
+    if (user) {
+      exists = true;
+    }
+    return exists;
   }
 
   // We perform all queries by id but the admin would not know the id of the user, therefore we retrieve the user
@@ -167,4 +163,53 @@ export class FirebaseService {
 
     return teams;
   }
+
+  async googleSignIn(): Promise<boolean> {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    let user = await this.angularFireAuth.auth.signInWithPopup(provider).then(result => {
+      var u = result.user;
+      return u;
+    }).catch(err => {
+      var errorCode = err.code;
+      if (errorCode === 'auth/account-exists-with-different-credential') {
+        alert("This email logged in using different credentials")
+      }
+      return;
+    });
+
+    if (user) {
+      console.log(user.photoURL)
+      let exists = await this.checkUserExists(user.email);
+      if (!exists)
+        await this.addUser(user);
+      return true;
+    }
+    return false;
+  }
+
+  async facebookSignIn(): Promise<boolean> {
+    var provider = new firebase.auth.FacebookAuthProvider();
+    let user = await this.angularFireAuth.auth.signInWithPopup(provider).then(result => {
+      var u = result.user;
+      return u;
+    }).catch(err => {
+      var errorCode = err.code;
+      if (errorCode === 'auth/account-exists-with-different-credential') {
+        alert("This email logged in using different credentials")
+      }
+      return;
+    })
+
+    if (user) {
+      console.log(user.photoURL)
+      let exists = await this.checkUserExists(user.email);
+      if (!exists)
+        await this.addUser(user);
+      return true;
+    }
+    return false;
+  }
 }
+
+
+// https://lh3.googleusercontent.com/a-/AOh14GgfciCXCXpP9Ij2vXsNykXtgZmVwP01znKq2Om6

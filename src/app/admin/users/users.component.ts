@@ -42,6 +42,7 @@ export class UsersComponent implements OnInit {
   selectedTeamToAddSteps = "";
 
   selectedTeamIDRemove = "";
+  currentUser: any;
 
   addStepsForm = new FormGroup({
     steps: new FormControl('', [
@@ -68,6 +69,7 @@ export class UsersComponent implements OnInit {
   async ngOnInit() {
     this.teams = await this.firebase.getTeams();
     await this.updateUsers();
+    this.currentUser = await this.firebase.getCurrentUser();
     this.loading = false;
   }
 
@@ -109,15 +111,24 @@ export class UsersComponent implements OnInit {
 
   deleteUser() {
     this.loading = true;
-    this.firebaseadmin.deleteUser(this.selectedId).subscribe(res => {
-      this.handleOkDelete();
+    try {
+      if (this.currentUser.uid == this.selectedId)
+        throw ({ 'code': 'auth/forbidden', 'message': 'It is not permitted to delete your own account' });
+
+      this.firebaseadmin.deleteUser(this.selectedId).subscribe(res => {
+        this.handleOkDelete();
+        this.loading = false;
+        alert("User deleted")
+      }, err => {
+        this.handleCancelDelete();
+        this.loading = false;
+        alert(err.error.code + "\n" + err.error.message)
+      })
+    } catch (err) {
       this.loading = false;
-      alert("User deleted")
-    }, err => {
+      alert(err.code + "\n" + err.message)
       this.handleCancelDelete();
-      this.loading = false;
-      alert(err.error.code + "\n" + err.error.message)
-    })
+    }
   }
 
   addSteps() {
@@ -135,13 +146,21 @@ export class UsersComponent implements OnInit {
 
   changeAdminStatus(id, team, isAdmin) {
     this.loading = true;
-    this.firebaseadmin.changeAdminStatus(id, team, isAdmin).subscribe(res => {
-      alert("User updated");
+    try {
+      if (this.currentUser.uid == id)
+        throw ({ 'code': 'auth/forbidden', 'message': 'It is not permitted to revoke your own adminship' });
+
+      this.firebaseadmin.changeAdminStatus(id, team, isAdmin).subscribe(res => {
+        alert("User updated");
+        this.loading = false;
+      }, err => {
+        this.loading = false;
+        alert(err.error.code + "\n" + err.error.message)
+      })
+    } catch (err) {
       this.loading = false;
-    }, err => {
-      this.loading = false;
-      alert(err.error.code + "\n" + err.error.message)
-    })
+      alert(err.code + "\n" + err.message)
+    }
   }
 
   addUserToTeam() {

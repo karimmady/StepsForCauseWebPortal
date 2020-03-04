@@ -34,69 +34,25 @@ export class LandingPageComponent implements OnInit {
   }
 
   async googleSignIn() {
-    var provider = new firebase.auth.GoogleAuthProvider();
-    this.user = await firebase.auth().signInWithPopup(provider).then(function (result) {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      var token = result.credential["accessToken"];
-      // The signed-in user info.
-      var user = result.user;
-      return user
-    }).catch(function (error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      if (errorCode === 'auth/account-exists-with-different-credential') {
-        alert("This email logged in using different credentials")
-      }
-      var errorMessage = error.message;
-      // The email of the user's account used.
-      var email = error.email;
-      // The firebase.auth.AuthCredential type that was used.
-      var credential = error.credential;
-      console.log(error)
-      return
-      // ...
-    });
-    if (this.user) {
-      this.exists = await this.firebaseService.checkUserExists(this.user.email);
-      if (!this.exists)
-        await this.firebaseService.AddUser(this.user)
-      // this.firebaseService.setUser(this.user)
-      this.router.navigate(['/user'])
-    }
-    else
-      console.log("error")
+    let signInComplete = await this.firebaseService.googleSignIn();
 
+    if (signInComplete) {
+      this.router.navigate(['/user']);
+    } else {
+      alert('auth/unexpected behavior' + '\n' +
+        'An unexpected error occured, please contact someone in charge');
+    }
   }
 
   async facebookSignIn() {
-    var provider = new firebase.auth.FacebookAuthProvider();
-    this.user = await firebase.auth().signInWithPopup(provider).then(function (result) {
-      var token = result.credential["accessToken"];
-      var user = result.user;
-      return user;
-    }).catch(function (error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      if (errorCode === 'auth/account-exists-with-different-credential') {
-        alert("This email logged in using different credentials")
-      }
-      var errorMessage = error.message;
-      // The email of the user's account used.
-      var email = error.email;
-      // The firebase.auth.AuthCredential type that was used.
-      var credential = error.credential;
-      return
-    });
-    if (this.user) {
-      this.exists = await this.firebaseService.checkUserExists(this.user.email);
-      if (!this.exists)
-        await this.firebaseService.AddUser(this.user)
-      // this.firebaseService.setUser(this.user)
-      this.router.navigate(['/user'])
-    }
-    else
-      console.log("error")
+    let signInComplete = await this.firebaseService.facebookSignIn();
 
+    if (signInComplete) {
+      this.router.navigate(['/user']);
+    } else {
+      alert('auth/unexpected behavior' + '\n' +
+        'An unexpected error occured, please contact someone in charge');
+    }
   }
 
   signUpPage() {

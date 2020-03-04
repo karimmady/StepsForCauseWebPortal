@@ -36,6 +36,10 @@ app.post('/admins', async (req, res) => {
             'name': req.body.firstName + " " + req.body.lastName,
             'isAdmin': true
         });
+
+        await db.collection('admins').doc(user.uid).set({
+            'uid': user.uid
+        });
     } catch (err) {
         res.status(500).send(err);
     }
@@ -119,6 +123,13 @@ app.put('/users/change-isAdmin', async (req, res) => {
                     user.ref.update({
                         'isAdmin': req.body.isAdmin
                     })
+                    if (req.body.isAdmin) {
+                        db.collection('admins').doc(user.data().uid).set({
+                            'uid': user.data().uid
+                        });
+                    } else {
+                        db.collection('admins').doc(user.data().uid).delete();
+                    }
                     res.status(200).send({ "message": "User updated" });
                 }
             });
@@ -126,6 +137,13 @@ app.put('/users/change-isAdmin', async (req, res) => {
             user.ref.update({
                 'isAdmin': req.body.isAdmin
             })
+            if (req.body.isAdmin) {
+                db.collection('admins').doc(user.data().uid).set({
+                    'uid': user.data().uid
+                });
+            } else {
+                db.collection('admins').doc(user.data().uid).delete();
+            }
             res.status(200).send({ "message": "User updated" });
         }
     }).catch(err => {
@@ -137,6 +155,8 @@ app.delete('/users', async (req, res) => {
     admin.auth().deleteUser(req.query.id).then(() => {
         db.collection('users').doc(req.query.id).get().then(user => {
             if (user.exists) {
+                if (user.data().isAdmin)
+                    db.collection('admins').doc(user.id).delete();
                 user.ref.delete();
                 res.status(200).send({ 'message': 'User deleted' });
             } else
@@ -154,6 +174,8 @@ app.delete('/users', async (req, res) => {
                                 'totalSteps': newSteps
                             })
                         })
+                        if (user.data().isAdmin)
+                            db.collection('admins').doc(user.id).delete();
                         user.ref.delete();
                         res.status(200).send({ 'message': 'User deleted' });
                     })
@@ -253,6 +275,8 @@ app.delete('/teams', async (req, res) => {
                 let batch = db.batch();
                 users.docs.forEach(user => {
                     admin.auth().deleteUser(user.data().uid);
+                    if (user.data().isAdmin)
+                        db.collection('admins').doc(user.id).delete();
                     batch.delete(user.ref);
                 })
 
