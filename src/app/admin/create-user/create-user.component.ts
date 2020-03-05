@@ -31,7 +31,11 @@ export class CreateUserComponent implements OnInit {
     ])
   });
 
-  constructor(private firebaseadmin: FirebaseAdminService, private authService: AuthService, private router: Router) { }
+  constructor(
+    private firebaseadmin: FirebaseAdminService,
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
   }

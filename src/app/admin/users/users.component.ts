@@ -1,28 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { FirebaseAdminService } from 'src/app/services/firebase-admin.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { AngularFirestoreCollection, AngularFirestoreCollectionGroup, AngularFirestore } from 'angularfire2/firestore';
-import { Observable } from 'rxjs';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { map } from 'rxjs/operators';
 import { combineLatest } from 'rxjs'
 import { _ } from 'underscore';
-
-export interface User {
-  name: string;
-  stepCount: number;
-  email: string;
-  team: string;
-}
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
+
 export class UsersComponent implements OnInit {
   isVisibleDelete = false;
   isVisibleSteps = false;

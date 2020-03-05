@@ -1,4 +1,4 @@
-import { NgModule, Component } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { SignupFormComponent } from './signup-form/signup-form.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';

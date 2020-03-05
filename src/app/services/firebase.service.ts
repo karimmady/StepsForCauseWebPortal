@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from "@angular/fire/auth";
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
 import * as firebase from 'firebase';
-import { environment } from 'src/environments/environment';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreCollectionGroup } from 'angularfire2/firestore';
+import { AngularFirestore } from 'angularfire2/firestore';
 
 export interface User {
   name: string;
@@ -18,10 +17,7 @@ export interface User {
 
 export class FirebaseService {
   userData: Observable<firebase.User>;
-  dbref: firebase.database.Reference;
   user: any;
-  private signUp = new BehaviorSubject(false);
-  signUpStatus = this.signUp.asObservable();
   dbUser: any;
 
   constructor(
@@ -29,7 +25,6 @@ export class FirebaseService {
     private _firestore: AngularFirestore,
   ) {
     this.userData = angularFireAuth.authState;
-    this.dbref = firebase.database().ref('/users');
   }
 
   /* Sign up */
@@ -94,11 +89,6 @@ export class FirebaseService {
     }
 
     return this.dbUser;
-  }
-
-  changeSignUpStatus(flag: boolean) {
-    console.log("Changing status", flag)
-    this.signUp.next(flag)
   }
 
   // Get the current firebase-auth-service user
@@ -210,6 +200,3 @@ export class FirebaseService {
     return false;
   }
 }
-
-
-// https://lh3.googleusercontent.com/a-/AOh14GgfciCXCXpP9Ij2vXsNykXtgZmVwP01znKq2Om6

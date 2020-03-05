@@ -1,20 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { AngularFireAuth } from '@angular/fire/auth';
-import * as firebase from 'firebase';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseAdminService {
-
-  userData: Observable<firebase.User>;
-  dbref: firebase.database.Reference;
-  user: any;
-  private signUp = new BehaviorSubject(false);
-  signUpStatus = this.signUp.asObservable();
 
   constructor(private http: HttpClient) { }
 

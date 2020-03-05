@@ -15,7 +15,7 @@
   <div class="title">
     <h1 class="title-text">Users</h1>
   </div>
-  <nz-spin class="page-when-loading" nzTip="Loading..." *ngIf="loading" [nzSize]="'large'">
+  <nz-spin nzTip="Loading..." *ngIf="loading" [nzSize]="'large'">
     <nz-table #basicTable [nzData]="users" [nzScroll]="{ x: '700px', y: '320px' }">
       <thead>
         <tr>

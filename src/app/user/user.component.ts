@@ -15,7 +15,7 @@ export class UserComponent implements OnInit {
   steps: number;
   loading: boolean;
 
-  constructor(private firebase: FirebaseService, private db: AngularFireDatabase) { }
+  constructor(private firebase: FirebaseService) { }
 
   async ngOnInit() {
     this.loading = true;

@@ -8,23 +8,12 @@
   flex-direction: row;
 }
 
-.steps {
-  width: 15%;
-  display: table;
-}
-.test {
-  float: right !important;
-  right: 0% !important;
-}
-.money {
-  width: 15%;
-  display: table;
-}
-.kiloMeters {
-  width: 15%;
-  display: table;
-}
 .inner {
-  display: table-cell;
+  width: 15%;
   text-align: center;
+}
+
+::ng-deep .inner > .ant-card-body {
+  padding: 24px 0px;
+  width: 100%;
 }

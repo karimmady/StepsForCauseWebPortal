@@ -10,6 +10,7 @@ import { FirebaseService } from 'src/app/services/firebase.service';
   templateUrl: './add-steps.component.html',
   styleUrls: ['./add-steps.component.css']
 })
+
 export class AddStepsComponent implements OnInit {
 
   validCompanyInfo = false;

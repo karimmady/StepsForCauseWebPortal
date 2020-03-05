@@ -1,18 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
-import { Observable } from 'rxjs';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreCollectionGroup } from 'angularfire2/firestore';
 import { map } from 'rxjs/operators';
 import { combineLatest } from 'rxjs'
-
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
+
 export class DashboardComponent implements OnInit {
 
   totalSteps = 0;
@@ -28,7 +26,6 @@ export class DashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    db: AngularFireDatabase,
     private afs: AngularFirestore
   ) {
     // Define what collection userCol points to and let userColVals contain the observable which will eventually

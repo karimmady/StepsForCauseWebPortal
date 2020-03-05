@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
-import * as firebase from 'firebase/app';
 import { AuthService } from '../services/auth.service';
-import { environment } from "../../environments/environment"
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
 import { FirebaseService } from '../services/firebase.service';
+
 @Component({
   selector: 'app-landing-page',
   templateUrl: './landing-page.component.html',
@@ -14,12 +13,12 @@ import { FirebaseService } from '../services/firebase.service';
 
 export class LandingPageComponent implements OnInit {
 
-  user: any;
-  db: AngularFireDatabase;
-  exists: any
-  loggedin: boolean
-  constructor(private router: Router, public afAuth: AngularFireAuth, private firebaseService: FirebaseService, private authService: AuthService) {
-  }
+  constructor(
+    private router: Router,
+    public afAuth: AngularFireAuth,
+    private firebaseService: FirebaseService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit() {
     this.authService.SignOut();
