@@ -14,7 +14,9 @@ import { CreateAdminComponent } from './admin/create-admin/create-admin.componen
 import { AuthGuard } from './auth.guard';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import { TeamsComponent } from './admin/teams/teams.component';
+import { StatisticsPageComponent } from './statistics-page/statistics-page.component';
 import { CountdownComponent } from './countdown/countdown.component';
+import { AnalyticsComponent } from './admin/analytics/analytics.component';
 const routes: Routes = [
   {
     path: '',
@@ -76,9 +78,19 @@ const routes: Routes = [
     component: UnauthorizedComponent
   },
   {
+    path: 'statistics',
+    component: StatisticsPageComponent
+  },
+  {
     path: 'countdown',
     component: CountdownComponent
+  },
+  {
+    path: 'admin/analytics',
+    component: AnalyticsComponent,
+    canActivate: [AuthGuard]
   }
+  
 ];
 
 @NgModule({

@@ -32,10 +32,29 @@ import { AuthGuard } from './auth.guard';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import * as firebase from 'firebase';
 import { TeamsComponent } from './admin/teams/teams.component';
+import { StatisticsPageComponent } from './statistics-page/statistics-page.component';
+import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
+import {
+  GoogleApiModule,
+  NgGapiClientConfig,
+  NG_GAPI_CONFIG
+  } from 'ng-gapi';
+import { AnalyticsComponent } from './admin/analytics/analytics.component';
 import { CountdownComponent } from './countdown/countdown.component';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
+import { GoogleChartsModule } from 'angular-google-charts';
 
 registerLocaleData(en);
+
+const gapiClientConfig: NgGapiClientConfig = {
+  client_id: '162441872618-ho9mko1fc7b2rno1qv4guus1ahq3ir1f.apps.googleusercontent.com',
+  discoveryDocs: ['https://content.googleapis.com/discovery/v1/apis/bigquery/v2/rest'],
+  scope: [
+     'https://www.googleapis.com/auth/bigquery',
+     'https://www.googleapis.com/auth/cloud-platform',
+     'https://www.googleapis.com/auth/cloud-platform.read-only'
+  ].join(' ')
+  };
 
 @NgModule({
   declarations: [
@@ -54,7 +73,9 @@ registerLocaleData(en);
     CreateAdminComponent,
     UnauthorizedComponent,
     TeamsComponent,
+    StatisticsPageComponent,
     CountdownComponent,
+    AnalyticsComponent,
   ],
   imports: [
     BrowserModule,
@@ -66,9 +87,15 @@ registerLocaleData(en);
     ReactiveFormsModule,
     CommonModule,
     HttpModule,
+    GoogleChartsModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase, 'steps-for-cause'),
     AngularFirestoreModule,
     AngularFireDatabaseModule,
+    AngularFireAnalyticsModule,
+    GoogleApiModule.forRoot({
+      provide: NG_GAPI_CONFIG,
+      useValue: gapiClientConfig
+      }),
   ],
   providers: [AngularFireAuth, , AngularFireDatabaseModule, AngularFireModule, AuthService, AuthGuard, { provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent]
