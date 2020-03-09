@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreCollectionGroup } from 'angularfire2/firestore';
 import { map } from 'rxjs/operators';
 import { combineLatest } from 'rxjs'
+import { FirebaseService } from 'src/app/services/firebase.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,7 +27,8 @@ export class DashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private afs: AngularFirestore
+    private afs: AngularFirestore,
+    private firebase: FirebaseService
   ) {
     // Define what collection userCol points to and let userColVals contain the observable which will eventually
     // contain the collection data
@@ -59,6 +61,7 @@ export class DashboardComponent implements OnInit {
         this.totalSteps += u.stepCount;
       });
       await Promise.all(total);
+      await this.firebase.updateTotalSteps(this.totalSteps);
 
       this.totalKM = this.totalSteps * 0.0008;
       this.totalMoney = this.totalKM * 10;

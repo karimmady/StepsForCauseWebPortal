@@ -51,14 +51,24 @@ export class FirebaseService {
     return user;
   }
 
-  async addUser(userInfo) {
-    await this._firestore.collection('users').doc(userInfo.uid).set({
-      'uid': userInfo.uid,
-      'email': userInfo.email,
-      'stepCount': 0,
-      'name': userInfo.displayName,
-      'photoURL': userInfo.photoURL
-    });
+  async addUser(userInfo, type = null) {
+    if (!type) {
+      await this._firestore.collection('users').doc(userInfo.uid).set({
+        'uid': userInfo.uid,
+        'email': userInfo.email,
+        'stepCount': 0,
+        'name': userInfo.displayName,
+        'photoURL': userInfo.photoURL
+      });
+    } else {
+      await this._firestore.collection('users').doc(userInfo.uid).set({
+        'uid': userInfo.uid,
+        'email': userInfo.email,
+        'stepCount': 0,
+        'name': userInfo.displayName,
+        'photoURL': userInfo.photoURL + '?type=large'
+      });
+    }
   }
 
   SignOut() {
@@ -168,7 +178,6 @@ export class FirebaseService {
     });
 
     if (user) {
-      console.log(user.photoURL)
       let exists = await this.checkUserExists(user.email);
       if (!exists)
         await this.addUser(user);
@@ -191,12 +200,18 @@ export class FirebaseService {
     })
 
     if (user) {
-      console.log(user.photoURL)
       let exists = await this.checkUserExists(user.email);
       if (!exists)
-        await this.addUser(user);
+        await this.addUser(user, 'facebook');
       return true;
     }
     return false;
+  }
+
+  async updateTotalSteps(total) {
+    let totalRef = this._firestore.collection('totalSteps').doc('steps');
+    totalRef.set({
+      'total': total
+    });
   }
 }

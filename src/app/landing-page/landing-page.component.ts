@@ -60,7 +60,6 @@ export class LandingPageComponent implements OnInit {
 
   signOut() {
     this.afAuth.auth.signOut().then(function () {
-      console.log("sign out")
     }).catch(function (error) {
       console.log(error)
     });
