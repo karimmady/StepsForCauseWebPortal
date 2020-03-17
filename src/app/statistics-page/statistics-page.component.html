@@ -1,27 +1,14 @@
 <div class="wrapper">
-  <div class="steps">
-    <nz-card class="inner" nzTitle="Total Steps">
-     <div class="test">
-       <h1 class="innerText">{{totalSteps}}</h1>
-       <h2 class="innerText">steps</h2>
-     </div>
-    </nz-card>
-  </div>
-  <div class="kiloMeters">
-    <nz-card class="inner" nzTitle="total KM">
-     <div class="test">
-       <h1 class="innerText">{{totalKM}}</h1>
-       <h2 class="innerText">KM</h2>
-     </div>
-    </nz-card>
-  </div>
-  <div class="money">
-    <nz-card class="inner" nzTitle="Money Donated">
-     <div class="test">
-       <h1 class="innerText">{{totalMoney}}</h1>
-       <h2 class="innerText">EAD</h2>
-     </div>
-    </nz-card>
-  </div>
- 
+  <nz-card class="inner" nzTitle="Total Steps">
+    <nz-card-meta nzTitle={{totalSteps}}></nz-card-meta>
+    <nz-card-meta nzTitle="Steps"></nz-card-meta>
+  </nz-card>
+  <nz-card class="inner" nzTitle="Total KM">
+    <nz-card-meta nzTitle={{totalKM}}></nz-card-meta>
+    <nz-card-meta nzTitle="KM"></nz-card-meta>
+  </nz-card>
+  <nz-card class="inner" nzTitle="Money Donated">
+    <nz-card-meta nzTitle={{totalMoney}}></nz-card-meta>
+    <nz-card-meta nzTitle="AED"></nz-card-meta>
+  </nz-card>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-countdown',
@@ -6,7 +6,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
   styleUrls: ['./countdown.component.css']
 })
 export class CountdownComponent implements OnInit {
-
   
   intervalId = 0;
   today = new Date();
@@ -18,6 +17,11 @@ export class CountdownComponent implements OnInit {
   minutesLeft = 0;
   minutes = 0;
   remainingSeconds = 0;
+
+  displayedDays = '';
+  displayedHours = '';
+  displayedMinutes = '';
+  displayedSeconds = '';
 
   clearTimer() { clearInterval(this.intervalId); }
 
@@ -37,10 +41,10 @@ export class CountdownComponent implements OnInit {
       function pad(n) {
         return (n < 10 ? "0" + n : n);
       }
-      document.getElementById('days').innerHTML = pad(this.days);
-      document.getElementById('hours').innerHTML = pad(this.hours);
-      document.getElementById('minutes').innerHTML = pad(this.minutes);
-      document.getElementById('seconds').innerHTML = parseInt(pad(this.remainingSeconds)).toString();
+      this.displayedDays = pad(this.days);
+      this.displayedHours = pad(this.hours);
+      this.displayedMinutes = pad(this.minutes);
+      this.displayedSeconds = parseInt(pad(this.remainingSeconds)).toString();
       if (this.seconds == 0) {
         clearInterval(this.intervalId);
         document.getElementById('countdown').innerHTML = "Completed";

@@ -41,6 +41,7 @@ import {
   } from 'ng-gapi';
 import { AnalyticsComponent } from './admin/analytics/analytics.component';
 import { CountdownComponent } from './countdown/countdown.component';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { GoogleChartsModule } from 'angular-google-charts';
 
 registerLocaleData(en);
@@ -88,6 +89,7 @@ const gapiClientConfig: NgGapiClientConfig = {
     HttpModule,
     GoogleChartsModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase, 'steps-for-cause'),
+    AngularFirestoreModule,
     AngularFireDatabaseModule,
     AngularFireAnalyticsModule,
     GoogleApiModule.forRoot({

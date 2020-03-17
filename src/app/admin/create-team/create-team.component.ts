@@ -19,7 +19,11 @@ export class CreateTeamComponent implements OnInit {
     ]),
   });
 
-  constructor(private authService: AuthService, private router: Router, private firebaseadmin: FirebaseAdminService) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private firebaseadmin: FirebaseAdminService
+  ) { }
 
   ngOnInit() {
   }

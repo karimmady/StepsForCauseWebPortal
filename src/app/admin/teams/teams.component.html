@@ -82,10 +82,10 @@
         <input class="members-modal-input" [(ngModel)]="stepsToAdd[j]" [ngModelOptions]="{standalone: true}" nz-input
           placeholder="Add Steps">
         <button class="member-modal-add-btn" nz-button nzType="primary"
-          (click)="addStepsToUser(user.email, stepsToAdd[j]);">Add</button>
+          (click)="addStepsToUser(user.uid, user.team, stepsToAdd[j]);">Add</button>
       </div>
       <div class="members-modal-remove">
-        <a (click)="removeUserFromTeam(user.email, user.team)">Remove From Team</a>
+        <a (click)="removeUserFromTeam(user.uid, user.team)">Remove From Team</a>
       </div>
     </div>
   </div>

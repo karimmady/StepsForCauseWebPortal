@@ -1,36 +1,40 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { FirebaseAdminService } from 'src/app/services/firebase-admin.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
-import { ThrowStmt } from '@angular/compiler';
-
-class User {
-  constructor(public name, public email, public password, public stepCount, public photo, public isAdmin) { }
-}
+import { AngularFirestoreCollection, AngularFirestoreCollectionGroup, AngularFirestore } from 'angularfire2/firestore';
+import { FirebaseService } from 'src/app/services/firebase.service';
+import { map } from 'rxjs/operators';
+import { combineLatest } from 'rxjs'
+import { _ } from 'underscore';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
+
 export class UsersComponent implements OnInit {
   isVisibleDelete = false;
   isVisibleSteps = false;
   isVisibleTeamAdd = false;
   isVisibleTeamRemove = false;
-  public dbref: AngularFireList<User>;
   loading = true;
-  records: any
-  users: Array<firebase.User>;
+  users = [];
+  teams: any;
+
+  userCol: AngularFirestoreCollection<any>;
+  userColVals: any;
+
+  teamCol: AngularFirestoreCollectionGroup<any>;
+  teamColVals: any;
 
   selectedId = "";
-  selectedEmail = "";
+  selectedTeamToAddSteps = "";
 
-  selectedEmailAddToTeam = "";
-  selectedEmailRemoveFromTeam = "";
-  selectedTeamNameRemove = "";
+  selectedTeamIDRemove = "";
+  currentUser: any;
 
   addStepsForm = new FormGroup({
     steps: new FormControl('', [
@@ -46,52 +50,82 @@ export class UsersComponent implements OnInit {
     ]),
   });
 
-  constructor(private db: AngularFireDatabase, private firebaseadmin: FirebaseAdminService,
-    private authService: AuthService, private router: Router) { }
+  constructor(
+    private firebase: FirebaseService,
+    private firebaseadmin: FirebaseAdminService,
+    private authService: AuthService,
+    private router: Router,
+    private afs: AngularFirestore
+  ) { }
 
-  ngOnInit() {
-    this.dbref = this.db.list('/users')
-    this.records = this.dbref.valueChanges();
-    this.records.subscribe(res => {
-      console.log(res)
-      this.users = res;
-      this.loading = false;
-    })
+  async ngOnInit() {
+    this.teams = await this.firebase.getTeams();
+    await this.updateUsers();
+    this.currentUser = await this.firebase.getCurrentUser();
+    this.loading = false;
   }
 
   logout() {
     this.authService.SignOut();
     this.router.navigate(['']);
   }
-  
+
+  /** This function is automatically called because of the subscription */
   async updateUsers() {
-    this.dbref = this.db.list('/users')
-    this.records = this.dbref.valueChanges();
-    this.records.subscribe(async res => {
-      console.log(res)
-      this.users = await res;
-      this.loading = false;
+    // Define what collection userCol points to and let userColVals contain the observable which will eventually
+    // contain the collection data
+    this.userCol = this.afs.collection<any>('users');
+    this.userColVals = this.userCol.snapshotChanges().pipe(
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data();
+        return { ...data };
+      }))
+    );
+
+    // Define what collectionGrou teamCol points to and let teamColVals contain the observable which will eventually
+    // contain the collectionGroup data
+    this.teamCol = this.afs.collectionGroup<any>('members');
+    this.teamColVals = this.teamCol.snapshotChanges().pipe(
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data();
+        return { ...data };
+      }))
+    );
+
+    // Combine the userColVals and teamColVals observables together and store their lates values as a single array
+    // in this.users
+    combineLatest(this.userColVals, this.teamColVals).pipe(
+      map(([x, y]) => x.concat(y) as Array<any>)
+    ).subscribe(users => {
+      this.users = users as [];
     })
   }
 
   deleteUser() {
     this.loading = true;
-    this.firebaseadmin.deleteUser(this.selectedId).subscribe(async res => {
-      await this.updateUsers().then(() => {
+    try {
+      if (this.currentUser.uid == this.selectedId)
+        throw ({ 'code': 'auth/forbidden', 'message': 'It is not permitted to delete your own account' });
+
+      this.firebaseadmin.deleteUser(this.selectedId).subscribe(res => {
         this.handleOkDelete();
         this.loading = false;
         alert("User deleted")
+      }, err => {
+        this.handleCancelDelete();
+        this.loading = false;
+        alert(err.error.code + "\n" + err.error.message)
       })
-    }, err => {
-      this.handleCancelDelete();
+    } catch (err) {
       this.loading = false;
-      alert(err.error.code + "\n" + err.error.message)
-    })
+      alert(err.code + "\n" + err.message)
+      this.handleCancelDelete();
+    }
   }
 
   addSteps() {
     this.loading = true;
-    this.firebaseadmin.addStepsToUser(this.selectedEmail, this.addStepsForm.value.steps).subscribe(res => {
+    this.firebaseadmin.addStepsToUser(this.selectedId, this.selectedTeamToAddSteps, this.addStepsForm.value.steps).subscribe(res => {
       this.handleOkSteps();
       this.loading = false;
       alert("Steps added");
@@ -102,22 +136,29 @@ export class UsersComponent implements OnInit {
     })
   }
 
-  changeAdminStatus(email, isAdmin) {
+  changeAdminStatus(id, team, isAdmin) {
     this.loading = true;
-    this.firebaseadmin.changeAdminStatus(email, isAdmin).subscribe(async res => {
-      await this.updateUsers().then(() => {
-        this.loading = false;
+    try {
+      if (this.currentUser.uid == id)
+        throw ({ 'code': 'auth/forbidden', 'message': 'It is not permitted to revoke your own adminship' });
+
+      this.firebaseadmin.changeAdminStatus(id, team, isAdmin).subscribe(res => {
         alert("User updated");
+        this.loading = false;
+      }, err => {
+        this.loading = false;
+        alert(err.error.code + "\n" + err.error.message)
       })
-    }, err => {
+    } catch (err) {
       this.loading = false;
-      alert(err.error.code + "\n" + err.error.message)
-    })
+      alert(err.code + "\n" + err.message)
+    }
   }
 
   addUserToTeam() {
     this.loading = true;
-    this.firebaseadmin.addUserToTeam(this.selectedEmailAddToTeam, this.addToTeamForm.value.teamName).subscribe(res => {
+    let teamID = (_.invert(this.teams))[this.addToTeamForm.value.teamName];
+    this.firebaseadmin.addUserToTeam(this.selectedId, teamID).subscribe(res => {
       this.handleOkTeamAdd();
       this.loading = false;
       alert("User added to team");
@@ -130,7 +171,7 @@ export class UsersComponent implements OnInit {
 
   removeUserFromTeam() {
     this.loading = true;
-    this.firebaseadmin.removeUserFromTeam(this.selectedEmailRemoveFromTeam, this.selectedTeamNameRemove).subscribe(res => {
+    this.firebaseadmin.removeUserFromTeam(this.selectedId, this.selectedTeamIDRemove).subscribe(res => {
       this.handleOkTeamRemove();
       this.loading = false;
       alert("User deleted from team");
@@ -151,12 +192,12 @@ export class UsersComponent implements OnInit {
   }
 
   handleCancelDelete(): void {
-    console.log('Button cancel clicked!');
     this.isVisibleDelete = false;
   }
 
-  showModalSteps(email): void {
-    this.selectedEmail = email;
+  showModalSteps(id, team): void {
+    this.selectedId = id;
+    this.selectedTeamToAddSteps = team;
     this.isVisibleSteps = true;
   }
 
@@ -165,12 +206,11 @@ export class UsersComponent implements OnInit {
   }
 
   handleCancelSteps(): void {
-    console.log('Button cancel clicked!');
     this.isVisibleSteps = false;
   }
 
-  showModalTeamAdd(email): void {
-    this.selectedEmailAddToTeam = email;
+  showModalTeamAdd(id): void {
+    this.selectedId = id;
     this.isVisibleTeamAdd = true;
   }
 
@@ -182,9 +222,9 @@ export class UsersComponent implements OnInit {
     this.isVisibleTeamAdd = false;
   }
 
-  showModalTeamRemove(email, teamName): void {
-    this.selectedEmailRemoveFromTeam = email;
-    this.selectedTeamNameRemove = teamName;
+  showModalTeamRemove(id, team): void {
+    this.selectedId = id;
+    this.selectedTeamIDRemove = team;
     this.isVisibleTeamRemove = true;
   }
 

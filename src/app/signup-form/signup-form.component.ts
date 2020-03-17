@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import {
   FormGroup,
   FormControl,
@@ -7,9 +6,6 @@ import {
 } from '@angular/forms';
 import { FirebaseService } from '../services/firebase.service';
 import { Router } from '@angular/router';
-class User {
-  constructor(public firstName, public lastName, public email, public password) { }
-}
 
 @Component({
   selector: 'app-signup-form',
@@ -21,10 +17,7 @@ export class SignupFormComponent implements OnInit {
   loading = false;
   submittedForm = false;
   validCompanyInfo = false;
-  companyName: any;
-  totalSteps: any;
-  public users: AngularFireList<User>;
-  com: any;
+
 
   signupForm = new FormGroup({
     firstName: new FormControl('', [
@@ -45,11 +38,10 @@ export class SignupFormComponent implements OnInit {
     ])
   });
 
-  constructor(private router: Router, private firebase: FirebaseService, db: AngularFireDatabase) {
-    this.users = db.list('/users')
-    this.com = this.users.valueChanges();
-    this.com.subscribe(res => console.log(res))
-  }
+  constructor(
+    private router: Router,
+    private firebase: FirebaseService
+  ) { }
 
   checkFormsValidity(): void {
     this.validCompanyInfo = this.signupForm.valid

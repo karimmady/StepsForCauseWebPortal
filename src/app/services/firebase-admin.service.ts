@@ -1,20 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { AngularFireAuth } from '@angular/fire/auth';
-import * as firebase from 'firebase';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseAdminService {
-
-  userData: Observable<firebase.User>;
-  dbref: firebase.database.Reference;
-  user: any;
-  private signUp = new BehaviorSubject(false);
-  signUpStatus = this.signUp.asObservable();
 
   constructor(private http: HttpClient) { }
 
@@ -44,9 +34,10 @@ export class FirebaseAdminService {
     return this.http.post("http://localhost:3000/users", body);
   }
 
-  addStepsToUser(email: string, addedStepCount: number) {
+  addStepsToUser(id, team, addedStepCount: number) {
     var body = {
-      "email": email,
+      "id": id,
+      "team": team,
       "addedStepCount": addedStepCount
     }
     return this.http.put("http://localhost:3000/users", body);
@@ -67,18 +58,18 @@ export class FirebaseAdminService {
     return this.http.post("http://localhost:3000/teams", body);
   }
 
-  addUserToTeam(email: string, teamName: string) {
+  addUserToTeam(id, team) {
     var body = {
-      "email": email,
-      "teamName": teamName
+      "id": id,
+      "team": team
     }
     return this.http.put("http://localhost:3000/teams/add-user", body);
   }
 
-  removeUserFromTeam(email: string, teamName: string) {
+  removeUserFromTeam(id, team) {
     var body = {
-      "email": email,
-      "teamName": teamName
+      "id": id,
+      "team": team
     }
     return this.http.put("http://localhost:3000/teams/remove-user", body);
   }
@@ -87,13 +78,14 @@ export class FirebaseAdminService {
     return this.http.get("http://localhost:3000/teams");
   }
 
-  deleteTeam(teamName) {
-    return this.http.delete(`http://localhost:3000/teams?teamName=${teamName}`);
+  deleteTeam(team) {
+    return this.http.delete(`http://localhost:3000/teams?team=${team}`);
   }
 
-  changeAdminStatus(email: string, isAdmin: boolean) {
+  changeAdminStatus(id, team, isAdmin: boolean) {
     var body = {
-      "email": email,
+      "id": id,
+      "team": team,
       "isAdmin": isAdmin
     }
     return this.http.put("http://localhost:3000/users/change-isAdmin", body);

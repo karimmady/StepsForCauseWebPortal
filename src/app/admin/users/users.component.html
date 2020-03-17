@@ -15,7 +15,7 @@
   <div class="title">
     <h1 class="title-text">Users</h1>
   </div>
-  <nz-spin class="page-when-loading" nzTip="Loading..." *ngIf="loading" [nzSize]="'large'">
+  <nz-spin nzTip="Loading..." *ngIf="loading" [nzSize]="'large'">
     <nz-table #basicTable [nzData]="users" [nzScroll]="{ x: '700px', y: '320px' }">
       <thead>
         <tr>
@@ -31,10 +31,10 @@
           <td nzWidth='150px' style="text-align: center;">{{data.name}}</td>
           <td nzWidth='150px' style="text-align: center;">{{data.email}}</td>
           <td nzWidth='80px' style="text-align: center;">{{data.stepCount}}</td>
-          <td nzWidth='150px' style="text-align: center;" *ngIf="data.team">{{data.team}}</td>
+          <td nzWidth='150px' style="text-align: center;" *ngIf="data.team">{{teams[data.team]}}</td>
           <td nzWidth='150px' style="text-align: center;" *ngIf="!data.team">-</td>
           <td nzWidth='150px' style="text-align: center;">
-            <a (click)="showModalSteps(data.email)">Add Steps</a>
+            <a (click)="showModalSteps(data.uid, data.team)">Add Steps</a>
             <nz-divider nzType="vertical"></nz-divider>
             <a (click)="showModalDelete(data.uid)">Delete</a>
             <nz-divider nzType="vertical"></nz-divider>
@@ -61,22 +61,22 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let data of basicTable.data">
+        <tr *ngFor="let data of basicTable.data;">
           <td nzWidth='150px' style="text-align: center;">{{data.name}}</td>
           <td nzWidth='150px' style="text-align: center;">{{data.email}}</td>
           <td nzWidth='80px' style="text-align: center;">{{data.stepCount}}</td>
-          <td nzWidth='150px' style="text-align: center;" *ngIf="data.team">{{data.team}}</td>
+          <td nzWidth='150px' style="text-align: center;" *ngIf="data.team">{{teams[data.team]}}</td>
           <td nzWidth='150px' style="text-align: center;" *ngIf="!data.team">-</td>
           <td nzWidth='150px' style="text-align: center;">
-            <a (click)="showModalSteps(data.email)">Add Steps</a>
+            <a (click)="showModalSteps(data.uid, data.team)">Add Steps</a>
             <nz-divider nzType="vertical"></nz-divider>
             <a (click)="showModalDelete(data.uid)">Delete</a>
             <nz-divider nzType="vertical"></nz-divider>
-            <a *ngIf="data.isAdmin" (click)="changeAdminStatus(data.email, false)">Revoke Admin</a>
-            <a *ngIf="!data.isAdmin" (click)="changeAdminStatus(data.email, true)">Make Admin</a>
+            <a *ngIf="data.isAdmin" (click)="changeAdminStatus(data.uid, data.team, false)">Revoke Admin</a>
+            <a *ngIf="!data.isAdmin" (click)="changeAdminStatus(data.uid, data.team, true)">Make Admin</a>
             <nz-divider nzType="vertical"></nz-divider>
-            <a *ngIf="data.team" (click)="showModalTeamRemove(data.email, data.team)">Remove From Team</a>
-            <a *ngIf="!data.team" (click)="showModalTeamAdd(data.email)">Add To Team</a>
+            <a *ngIf="data.team" (click)="showModalTeamRemove(data.uid, data.team)">Remove From Team</a>
+            <a *ngIf="!data.team" (click)="showModalTeamAdd(data.uid)">Add To Team</a>
           </td>
         </tr>
       </tbody>
